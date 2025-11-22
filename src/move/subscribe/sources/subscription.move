@@ -21,6 +21,7 @@ public struct Service has key {
     ttl: u64,
     owner: address,
     name: String,
+    creator_metadata_blob_id: String,
 }
 
 public struct Subscription has key {
@@ -40,13 +41,14 @@ public struct Cap has key {
 /// Create a service.
 /// The associated key-ids are [pkg id]::[service id][nonce] for any nonce (thus
 /// many key-ids can be created for the same service).
-public fun create_service(fee: u64, ttl: u64, name: String, ctx: &mut TxContext): Cap {
+public fun create_service(fee: u64, ttl: u64, name: String, creator_metadata_blob_id: String, ctx: &mut TxContext): Cap {
     let service = Service {
         id: object::new(ctx),
         fee: fee,
         ttl: ttl,
         owner: ctx.sender(),
         name: name,
+        creator_metadata_blob_id: creator_metadata_blob_id,
     };
     let cap = Cap {
         id: object::new(ctx),
@@ -57,8 +59,8 @@ public fun create_service(fee: u64, ttl: u64, name: String, ctx: &mut TxContext)
 }
 
 // convenience function to create a service and share it (simpler ptb for cli)
-entry fun create_service_entry(fee: u64, ttl: u64, name: String, ctx: &mut TxContext) {
-    transfer::transfer(create_service(fee, ttl, name, ctx), ctx.sender());
+entry fun create_service_entry(fee: u64, ttl: u64, name: String, creator_metadata_blob_id: u256, ctx: &mut TxContext) {
+    transfer::transfer(create_service(fee, ttl, name, creator_metadata_blob_id, ctx), ctx.sender());
 }
 
 public fun subscribe(
