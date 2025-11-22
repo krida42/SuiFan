@@ -20,6 +20,9 @@ importers:
       '@mysten/walrus':
         specifier: ^0.8.4
         version: 0.8.4(typescript@5.9.3)
+      '@tanstack/react-query':
+        specifier: ^5.90.10
+        version: 5.90.10(react@18.3.1)
       lucide-react:
         specifier: ^0.292.0
         version: 0.292.0(react@18.3.1)
