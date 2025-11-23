@@ -223,7 +223,7 @@ export const useDecryptCreatorContent = (): UseDecryptCreatorContentReturn => {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
         const randomAggregator = aggregators[Math.floor(Math.random() * aggregators.length)];
-        const aggregatorUrl = `/${randomAggregator}/v1/blobs/${blobId}`;
+        const aggregatorUrl = `https://aggregator.walrus-testnet.walrus.space/v1/blobs/${blobId}`;
 
         console.debug("[DecryptContent] Downloading encrypted blob from Walrus", {
           aggregator: randomAggregator,

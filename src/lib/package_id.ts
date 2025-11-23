@@ -1,2 +1,2 @@
-export const ContentCreatorpackageId = "0x444ff1885c7e421795090e2500c7559da216267cf9a7732dd513df4399ad991a";
-export const allCreatorObjectId = "0xc8c948ca214e43a96e4a171aa48716f56a84b26b416ce5d4f322a7364c5328dd";
+export const ContentCreatorpackageId = "0xe1c1cc371a7e33a49ade842afb4bd273786430ef0cc9b3462fb5476433cc3ada";
+export const allCreatorObjectId = "0x1ea227c32d4879d9c01fc0fb7bd3779aaa02b6d626f8151f3ce6624e5ad3943f";
