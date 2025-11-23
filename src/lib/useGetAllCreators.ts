@@ -105,13 +105,18 @@ export const useGetAllCreators = () => {
       .map((obj) => {
         const fields = (obj.data?.content as { fields: any } | null)?.fields;
         if (!fields) return null;
+
+        const pseudoFirstChar = fields.pseudo.charAt(0);
+        const pseudoSecondChar = fields.pseudo.charAt(1);
+        const imageUrl = `https://avatar.iran.liara.run/username?username=${pseudoFirstChar}+${pseudoSecondChar}`;
+
         return {
           id: fields.id?.id as string,
           pseudo: fields.pseudo as string,
           description: fields.description as string,
           // The Move struct exposes `wallet: address`; we surface it as `owner` in the UI.
           owner: fields.wallet as string,
-          image_url: fields.image_url as string,
+          image_url: imageUrl as string,
           price_per_month: String((fields as any).price_per_month ?? "0"),
         } as ContentCreator;
       })

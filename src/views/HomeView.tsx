@@ -74,7 +74,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ goToCreator }) => {
               <CardContent className="pt-6 space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="flex-shrink-0 w-12 h-12 overflow-hidden rounded-full bg-slate-100">
-                    <img src={"https://avatar.iran.liara.run/public"} alt={creator.pseudo} className="object-cover w-full h-full" />
+                    <img
+                      src={creator.image_url || "https://avatar.iran.liara.run/public"}
+                      alt={creator.pseudo}
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-sm font-semibold truncate text-slate-900">{creator.pseudo}</h3>

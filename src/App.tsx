@@ -79,12 +79,16 @@ export default function VideoPlatformPrototype() {
     if (creatorOrName && typeof creatorOrName === "object" && "id" in creatorOrName && "pseudo" in creatorOrName) {
       const creator = creatorOrName as ContentCreator;
 
+      const pseudoFirstChar = creator.pseudo.charAt(0);
+      const pseudoSecondChar = creator.pseudo.charAt(1);
+      const imageUrl = `https://avatar.iran.liara.run/username?username=${pseudoFirstChar}+${pseudoSecondChar}`;
+
       const mappedCreator: Creator = {
         id: creator.id,
         name: creator.pseudo || "Créateur",
         handle: creator.pseudo?.toLowerCase().replace(/\s+/g, "") || creator.owner,
-        avatarUrl: creator.image_url || "https://placehold.co/128x128/1e40af/ffffff",
-        bannerUrl: creator.image_url || "https://placehold.co/1200x400/312e81/ffffff",
+        avatarUrl: imageUrl || "https://placehold.co/128x128/1e40af/ffffff",
+        bannerUrl: imageUrl || "https://placehold.co/1200x400/312e81/ffffff",
         bio: creator.description || "",
         subscribers: "0",
         isVerified: false,
@@ -215,7 +219,7 @@ export default function VideoPlatformPrototype() {
               <div className="flex items-center justify-center w-8 h-8 bg-indigo-600 rounded-lg">
                 <Play className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900">OpenStream</span>
+              <span className="text-xl font-bold tracking-tight text-slate-900">SuiFan</span>
             </div>
 
             {/* Desktop Nav */}
@@ -325,17 +329,17 @@ export default function VideoPlatformPrototype() {
       )}
 
       {/* --- Footer --- */}
-      <footer className="py-12 mt-12 bg-white border-t border-slate-200">
+      {/* <footer className="py-12 mt-12 bg-white border-t border-slate-200">
         <div className="container px-4 mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-4 opacity-50">
             <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-900">
               <Play className="w-3 h-3 text-white fill-current" />
             </div>
-            <span className="text-lg font-bold tracking-tight text-slate-900">OpenStream</span>
+            <span className="text-lg font-bold tracking-tight text-slate-900">SuiFan</span>
           </div>
           <p className="text-sm text-slate-500">© 2024 Plateforme Décentralisée Prototype. Design Concept for demonstration.</p>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }

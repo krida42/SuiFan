@@ -72,7 +72,11 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
           <div className="flex items-end gap-6 -mt-12">
             <div className="relative z-10 w-32 h-32 overflow-hidden bg-white border-4 border-white rounded-full shadow-md">
-              <img src={"https://avatar.iran.liara.run/public"} alt="Close up portrait of the creator" className="object-cover w-full h-full" />
+              <img
+                src={activeCreator.avatarUrl || "https://avatar.iran.liara.run/public"}
+                alt="Close up portrait of the creator"
+                className="object-cover w-full h-full"
+              />
             </div>
             <div className="mb-2">
               <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-900">
