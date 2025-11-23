@@ -5,6 +5,7 @@ import { Button } from "../components/Button";
 import { Card, CardContent } from "../components/Card";
 import { useGetCreators } from "../lib/useGetCreators";
 import { useEncryptAndPushToWalrus } from "../lib/encryptAndPushToWalrus";
+import { useGetAllCreators } from "../lib/useGetAllCreators";
 
 interface CreatorDashboardViewProps {
   dashboardStats: DashboardStats | null;
@@ -26,7 +27,7 @@ type ContentCreator = {
 };
 
 export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dashboardStats, handleUpload }) => {
-  const getCreators = useGetCreators();
+  const getCreators = useGetAllCreators();
   const [creators, setCreators] = useState<ContentCreator[]>([]);
   const [selectedCreatorId, setSelectedCreatorId] = useState("");
   const [isLoadingCreators, setIsLoadingCreators] = useState(false);
