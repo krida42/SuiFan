@@ -2,7 +2,7 @@ import { useSuiClient } from "@mysten/dapp-kit";
 import { SealClient } from "@mysten/seal";
 import { fromHex, toHex } from "@mysten/sui/utils";
 import { useState } from "react";
-import { packageId } from "./package_id";
+import { ContentCreatorpackageId } from "./package_id";
 
 export const useEncryptAndPushToWalrus = () => {
   const [isUploading, setIsUploading] = useState(false);
@@ -22,40 +22,63 @@ export const useEncryptAndPushToWalrus = () => {
 
   const handleSubmit = async (file: File, policyObject: string) => {
     setIsUploading(true);
-    if (file) {
+
+    return new Promise<{ info: any }>((resolve, reject) => {
+      if (!file) {
+        setIsUploading(false);
+        console.error("No file selected");
+        reject(new Error("No file selected"));
+        return;
+      }
+
       const reader = new FileReader();
+
       reader.onload = async function (event) {
-        if (event.target && event.target.result) {
-          const result = event.target.result;
-          if (result instanceof ArrayBuffer) {
-            const nonce = crypto.getRandomValues(new Uint8Array(5));
-            const policyObjectBytes = fromHex(policyObject);
-            const id = toHex(new Uint8Array([...policyObjectBytes, ...nonce]));
-            const { encryptedObject: encryptedBytes } = await client.encrypt({
-              threshold: 2,
-              packageId,
-              id,
-              data: new Uint8Array(result),
-            });
-            const storageInfo = await storeBlob(encryptedBytes);
-            console.log("🚀 ~ handleSubmit ~ storageInfo:", storageInfo);
-            setIsUploading(false);
+        try {
+          if (event.target && event.target.result) {
+            const result = event.target.result;
+            if (result instanceof ArrayBuffer) {
+              const nonce = crypto.getRandomValues(new Uint8Array(5));
+              const policyObjectBytes = fromHex(policyObject);
+              const id = toHex(new Uint8Array([...policyObjectBytes, ...nonce]));
+              const { encryptedObject: encryptedBytes } = await client.encrypt({
+                threshold: 2,
+                packageId: ContentCreatorpackageId,
+                id,
+                data: new Uint8Array(result),
+              });
+              const storageInfo = await storeBlob(encryptedBytes);
+              console.log("🚀 ~ handleSubmit ~ storageInfo:", storageInfo);
+              resolve(storageInfo);
+            } else {
+              console.error("Unexpected result type:", typeof result);
+              reject(new Error("Unexpected result type when reading file"));
+            }
           } else {
-            console.error("Unexpected result type:", typeof result);
-            setIsUploading(false);
+            reject(new Error("Empty file result"));
           }
+        } catch (error) {
+          console.error("Error during encrypt + Walrus upload", error);
+          reject(error);
+        } finally {
+          setIsUploading(false);
         }
       };
+
+      reader.onerror = function (event) {
+        console.error("Error reading file", event);
+        setIsUploading(false);
+        reject(new Error("Error reading file"));
+      };
+
       reader.readAsArrayBuffer(file);
-    } else {
-      console.error("No file selected");
-    }
+    });
   };
 
   const storeBlob = (encryptedData: Uint8Array) => {
     return fetch(`https://publisher.walrus-testnet.walrus.space/v1/blobs?epochs=${1}`, {
       method: "PUT",
-      body: encryptedData,
+      body: encryptedData as unknown as BodyInit,
     }).then((response) => {
       if (response.status === 200) {
         return response.json().then((info) => {

@@ -8,7 +8,7 @@ import { useEncryptAndPushToWalrus } from "../lib/encryptAndPushToWalrus";
 
 interface CreatorDashboardViewProps {
   dashboardStats: DashboardStats | null;
-  handleUpload: (e: any) => void;
+  handleUpload: (payload: { title: string; description: string; blobId: string; creatorId: string; fileName: string | null }) => Promise<void> | void;
 }
 
 type ContentCreator = {
@@ -25,6 +25,12 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
   const [selectedCreatorId, setSelectedCreatorId] = useState("");
   const [isLoadingCreators, setIsLoadingCreators] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [blobId, setBlobId] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [walrusError, setWalrusError] = useState<string | null>(null);
+  const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
   const { handleSubmit: handleWalrusSubmit, isUploading } = useEncryptAndPushToWalrus();
 
   useEffect(() => {
@@ -65,9 +71,66 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
     }
 
     setSelectedFileName(file.name);
-    handleWalrusSubmit(file, selectedCreatorId).catch((error) => {
-      console.error("Erreur lors de l'encrypt + push Walrus", error);
-    });
+    setBlobId(null);
+    setWalrusError(null);
+
+    handleWalrusSubmit(file, selectedCreatorId)
+      .then((storageInfo) => {
+        const maybeBlobId = storageInfo?.info?.newlyCreated?.blobObject?.blobId ?? storageInfo?.info?.blobObject?.blobId ?? storageInfo?.info?.blobId;
+
+        if (!maybeBlobId) {
+          console.error("Impossible de récupérer blobId depuis Walrus storageInfo", storageInfo);
+          setWalrusError("Erreur: impossible de récupérer l'identifiant du fichier chiffré.");
+          return;
+        }
+
+        setBlobId(maybeBlobId);
+      })
+      .catch((error) => {
+        console.error("Erreur lors de l'encrypt + push Walrus", error);
+        setWalrusError("Erreur lors du chiffrement et de l'envoi sur Walrus. Veuillez réessayer.");
+      });
+  };
+
+  const handleSubmitClick = async () => {
+    setHasTriedSubmit(true);
+    setFormError(null);
+
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedTitle || !trimmedDescription || !blobId) {
+      const missing: string[] = [];
+      if (!trimmedTitle) missing.push("titre");
+      if (!trimmedDescription) missing.push("description");
+      if (!blobId) missing.push("fichier chiffré");
+
+      setFormError(`Merci de renseigner: ${missing.join(", ")}.`);
+      return;
+    }
+
+    if (!selectedCreatorId) {
+      setFormError("Veuillez sélectionner un créateur.");
+      return;
+    }
+
+    if (isUploading) {
+      setFormError("Le fichier est encore en cours de chiffrement. Merci de patienter.");
+      return;
+    }
+
+    try {
+      await handleUpload({
+        title: trimmedTitle,
+        description: trimmedDescription,
+        blobId,
+        creatorId: selectedCreatorId,
+        fileName: selectedFileName,
+      });
+    } catch (error) {
+      console.error("Erreur lors de la publication de la vidéo", error);
+      setFormError("Erreur lors de la publication de la vidéo. Veuillez réessayer.");
+    }
   };
 
   return (
@@ -111,16 +174,26 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
               <label className="block mb-1 text-sm font-medium text-slate-700">Titre de la vidéo</label>
               <input
                 type="text"
-                className="w-full p-2 border rounded-md outline-none border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className={`w-full p-2 border rounded-md outline-none focus:ring-2 focus:border-transparent ${
+                  hasTriedSubmit && !title.trim() ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-indigo-500"
+                }`}
                 placeholder="Ex: Tutoriel Exclusif..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
+              {hasTriedSubmit && !title.trim() && <p className="mt-1 text-xs text-red-600">Le titre est requis.</p>}
             </div>
             <div>
               <label className="block mb-1 text-sm font-medium text-slate-700">Description</label>
               <textarea
-                className="w-full h-24 p-2 border border-transparent rounded-md outline-none resize-none border-slate-300 focus:ring-2 focus:ring-indigo-500"
+                className={`w-full h-24 p-2 border rounded-md outline-none resize-none focus:ring-2 focus:border-transparent ${
+                  hasTriedSubmit && !description.trim() ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-indigo-500"
+                }`}
                 placeholder="De quoi parle votre vidéo ?"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               ></textarea>
+              {hasTriedSubmit && !description.trim() && <p className="mt-1 text-xs text-red-600">La description est requise.</p>}
             </div>
 
             {/* <div className="grid grid-cols-2 gap-4">
@@ -162,13 +235,18 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
                     Fichier sélectionné: <span className="font-semibold text-slate-700">{selectedFileName}</span>
                   </p>
                 )}
+                {hasTriedSubmit && !blobId && (
+                  <p className="mt-1 text-xs text-red-600">Un fichier doit être sélectionné et chiffré avec succès avant la mise en ligne.</p>
+                )}
+                {walrusError && <p className="mt-1 text-xs text-red-600">{walrusError}</p>}
               </div>
             </label>
 
             <div className="pt-2">
-              <Button variant="accent" className="w-full" onClick={handleUpload}>
+              <Button variant="accent" className="w-full" onClick={handleSubmitClick} disabled={isUploading}>
                 Mettre en ligne
               </Button>
+              {formError && <p className="mt-2 text-xs text-red-600">{formError}</p>}
             </div>
           </CardContent>
         </Card>

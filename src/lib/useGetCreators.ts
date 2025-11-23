@@ -1,5 +1,5 @@
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
-import { packageId } from "./package_id";
+import { ContentCreatorpackageId } from "./package_id";
 
 export const useGetCreators = () => {
   const suiClient = useSuiClient();
@@ -22,7 +22,7 @@ export const useGetCreators = () => {
         showType: true,
       },
       filter: {
-        StructType: `${packageId}::content_creator::ContentCreator`,
+        StructType: `${ContentCreatorpackageId}::content_creator::ContentCreator`,
       },
     });
     const contentCreators = res.data

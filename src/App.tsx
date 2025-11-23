@@ -140,11 +140,17 @@ export default function VideoPlatformPrototype() {
     }
   };
 
-  const handleUpload = async (e: any) => {
-    e.preventDefault();
+  const handleUpload = async (payload: { title: string; description: string; blobId: string; creatorId: string; fileName: string | null }) => {
     setIsLoading(true);
+
     const formData = new FormData();
-    formData.append("title", "New Video"); // In real app, gather from form inputs
+    formData.append("title", payload.title);
+    formData.append("description", payload.description);
+    formData.append("blobId", payload.blobId);
+    formData.append("creatorId", payload.creatorId);
+    if (payload.fileName) {
+      formData.append("fileName", payload.fileName);
+    }
 
     await api.uploadVideo(formData);
 

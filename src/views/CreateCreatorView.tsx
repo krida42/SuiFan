@@ -8,6 +8,7 @@ import { createWalrusService } from "../lib/walrusServiceSDK";
 import { useWalrusFileUpload } from "../lib/useWalrusUpload";
 import { WalrusUpload } from "../lib/WalrusUpload";
 import { publishImageOnWalrus } from "../lib/publish_image_on_walrus";
+import { allCreatorObjectId, ContentCreatorpackageId } from "../lib/package_id";
 
 export const CreateCreatorView: React.FC = () => {
   const currentAccount = useCurrentAccount();
@@ -75,8 +76,14 @@ export const CreateCreatorView: React.FC = () => {
     const image_url = `https://aggregator.walrus-testnet.walrus.space/v1/${blobId}`;
 
     tx.moveCall({
-      target: "0x2f810ea3d93368e4ec19ecdb591caef8e4f22b0c7e8dfdb9c40fb53e200e56d3::content_creator::new",
-      arguments: [tx.pure.string(name), tx.pure.u64(Math.floor(parseFloat(subscribePrice))), tx.pure.string(description), tx.pure.string(image_url)],
+      target: `${ContentCreatorpackageId}::content_creator::new`,
+      arguments: [
+        tx.object(allCreatorObjectId),
+        tx.pure.string(name),
+        tx.pure.u64(Math.floor(parseFloat(subscribePrice))),
+        tx.pure.string(description),
+        tx.pure.string(image_url),
+      ],
     });
 
     await signAndExecuteTransaction(
