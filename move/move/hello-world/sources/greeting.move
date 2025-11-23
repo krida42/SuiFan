@@ -39,7 +39,7 @@ module sui_fan::content_creator {
 
     // const EInvalidCap: u64 = 0;
     const EInvalidFee: u64 = 1;
-    // const ENoAccess: u64 = 2;
+    const ENoAccess: u64 = 2;
     // const MARKER: u64 = 3;
 
 
@@ -116,6 +116,37 @@ module sui_fan::content_creator {
         transfer::transfer(new_content, ctx.sender());
         // new_content
         
+    }
+
+    public fun is_prefix(prefix: vector<u8>, word: vector<u8>): bool {
+        if (prefix.length() > word.length()) {
+            return false
+        };
+        let mut i = 0;
+        while (i < prefix.length()) {
+            if (prefix[i] != word[i]) {
+                return false
+            };
+            i = i + 1;
+        };
+        true
+    }
+
+    /// All allowlisted addresses can access all IDs with the prefix of the allowlist
+    fun check_policy(id: vector<u8>, sub: &Subscription, creator: &ContentCreator, c: &Clock): bool {
+        if (object::id(creator) != sub.creator_id) {
+            return false
+        };
+        if (c.timestamp_ms() > sub.created_at + 60 * 60 * 24 * 30) {
+            return false
+        };
+
+        // Check if the id has the right prefix
+        is_prefix(creator.id.to_bytes(), id)
+    }
+
+    entry fun seal_approve(id: vector<u8>, sub: &Subscription, creator: &ContentCreator, c: &Clock) {
+        assert!(check_policy(id, sub, creator, c), ENoAccess);
     }
 
     public fun subscribe(
