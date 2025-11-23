@@ -1,2 +1,3 @@
-export const ContentCreatorpackageId = "0xe86da0a6858815a9e2aae0526d8a39d3417df9eb47db950fe2694013ef5720e3";
-export const allCreatorObjectId = "0x906354e12e33be412fdf7ea20f46a090769560c20f477a7be246a2f6d60265a2";
+export const ContentCreatorpackageId =
+  import.meta.env.VITE_CONTENT_CREATOR_PACKAGE_ID || "0x13edc4ead50d8b67ac30ab5caf1d2342d7fd5376b836dd8aa73aaba7d8f6b8b4";
+export const allCreatorObjectId = import.meta.env.VITE_ALL_CREATOR_OBJECT_ID || "0xd6f5d9c3808fdd06b4ebf53746e8b20c50a539120862d90507d525993a2b4eb8";
