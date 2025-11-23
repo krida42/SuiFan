@@ -14,14 +14,14 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({ currentUser, i
   return (
     <div className="max-w-3xl mx-auto animate-in fade-in">
       <div className="flex items-center gap-6 mb-8">
-        <div className="flex items-center justify-center w-20 h-20 text-3xl font-bold text-white bg-indigo-600 border-4 border-white rounded-full shadow-lg">
+        <div className="flex items-center justify-center w-20 h-20 text-3xl font-bold text-white bg-gradient-to-br from-indigo-500 to-violet-600 border-4 border-white/10 rounded-full shadow-lg shadow-indigo-500/30">
           JD
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Jean Dupont</h1>
-          <p className="text-slate-500">jean.dupont@exemple.fr</p>
+          <h1 className="text-2xl font-bold text-white">Jean Dupont</h1>
+          <p className="text-slate-400">jean.dupont@exemple.fr</p>
           <div className="flex gap-2 mt-2">
-            <Badge variant="default" className="text-indigo-700 bg-indigo-100">
+            <Badge variant="default" className="text-indigo-300 bg-indigo-500/20 border border-indigo-500/30">
               Utilisateur Vérifié
             </Badge>
           </div>
@@ -31,18 +31,18 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({ currentUser, i
       <div className="space-y-8">
         {/* Section: Subscriptions */}
         <section>
-          <h2 className="flex items-center gap-2 mb-4 text-lg font-bold text-slate-900">
-            <UserIcon className="w-5 h-5 text-slate-500" /> Abonnements
+          <h2 className="flex items-center gap-2 mb-4 text-lg font-bold text-white">
+            <UserIcon className="w-5 h-5 text-indigo-400" /> Abonnements
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Sub 1 */}
-            <Card className="flex items-center gap-4 p-4 transition-colors cursor-pointer hover:border-indigo-200">
-              <div className="w-12 h-12 overflow-hidden rounded-full bg-slate-200">
+            <Card className="flex items-center gap-4 p-4 transition-all cursor-pointer hover:border-indigo-500/50 hover:bg-white/10 glass-panel border-white/10">
+              <div className="w-12 h-12 overflow-hidden rounded-full bg-slate-800">
                 <img src="https://placehold.co/100x100/6366f1/ffffff" alt="Creator avatar" className="object-cover w-full h-full" />
               </div>
               <div>
-                <h4 className="font-semibold text-slate-900">TechDaily</h4>
-                <p className="flex items-center gap-1 text-xs font-medium text-green-600">
+                <h4 className="font-semibold text-white">TechDaily</h4>
+                <p className="flex items-center gap-1 text-xs font-medium text-green-400">
                   <ShieldCheck className="w-3 h-3" /> Abonnement Actif
                 </p>
               </div>
@@ -50,8 +50,8 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({ currentUser, i
 
             {/* Sub 2 (Conditional) */}
             {isSubscribed && (
-              <Card className="flex items-center gap-4 p-4 transition-colors border-indigo-500 cursor-pointer hover:border-indigo-200 ring-1 ring-indigo-500/20">
-                <div className="w-12 h-12 overflow-hidden rounded-full bg-slate-200">
+              <Card className="flex items-center gap-4 p-4 transition-all border-indigo-500/50 cursor-pointer hover:border-indigo-400 ring-1 ring-indigo-500/20 glass-panel bg-indigo-500/5">
+                <div className="w-12 h-12 overflow-hidden rounded-full bg-slate-800">
                   <img
                     src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c26f327a-fef3-4e0a-af22-064615352458.png"
                     alt="Current active creator avatar"
@@ -59,8 +59,8 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({ currentUser, i
                   />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-slate-900">Nouveau Créateur</h4>
-                  <p className="text-xs font-medium text-indigo-600">Récemment abonné</p>
+                  <h4 className="font-semibold text-white">Nouveau Créateur</h4>
+                  <p className="text-xs font-medium text-indigo-400">Récemment abonné</p>
                 </div>
               </Card>
             )}
@@ -69,32 +69,32 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({ currentUser, i
 
         {/* Section: Unlocked Content */}
         <section>
-          <h2 className="flex items-center gap-2 mb-4 text-lg font-bold text-slate-900">
-            <Unlock className="w-5 h-5 text-slate-500" /> Contenus Débloqués
+          <h2 className="flex items-center gap-2 mb-4 text-lg font-bold text-white">
+            <Unlock className="w-5 h-5 text-indigo-400" /> Contenus Débloqués
           </h2>
           {(currentUser?.unlockedVideoIds?.length || 0) > 0 ? (
-            <div className="overflow-hidden bg-white border rounded-xl border-slate-200">
+            <div className="overflow-hidden glass-panel border rounded-xl border-white/10">
               {currentUser?.unlockedVideoIds.map((id) => (
                 <div
                   key={id}
-                  className="flex items-center gap-4 p-4 transition-colors border-b cursor-pointer border-slate-100 last:border-0 hover:bg-slate-50"
+                  className="flex items-center gap-4 p-4 transition-colors border-b cursor-pointer border-white/5 last:border-0 hover:bg-white/5"
                 >
-                  <div className="p-2 bg-indigo-100 rounded-lg">
-                    <Play className="w-5 h-5 text-indigo-700 fill-indigo-700" />
+                  <div className="p-2 bg-indigo-500/20 rounded-lg">
+                    <Play className="w-5 h-5 text-indigo-400 fill-indigo-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-900">Contenu Premium #{id}</p>
-                    <p className="text-xs text-slate-500">Débloqué le {new Date().toLocaleDateString()}</p>
+                    <p className="font-medium text-white">Contenu Premium #{id}</p>
+                    <p className="text-xs text-slate-400">Débloqué le {new Date().toLocaleDateString()}</p>
                   </div>
-                  <Button variant="ghost" className="h-8 ml-auto text-xs">
+                  <Button variant="ghost" className="h-8 ml-auto text-xs text-slate-300 hover:text-white">
                     Revoir
                   </Button>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center border border-dashed border-slate-300 rounded-xl bg-slate-50">
-              <p className="text-sm text-slate-500">Aucune vidéo achetée récemment.</p>
+            <div className="p-8 text-center border border-dashed border-white/10 rounded-xl bg-white/5">
+              <p className="text-sm text-slate-400">Aucune vidéo achetée récemment.</p>
             </div>
           )}
         </section>

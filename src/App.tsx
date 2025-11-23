@@ -209,25 +209,30 @@ export default function VideoPlatformPrototype() {
   }
 
   return (
-    <div className="min-h-screen pb-20 font-sans bg-slate-50 text-slate-900">
+    <div className="min-h-screen pb-20 font-sans text-slate-100 relative overflow-hidden">
+      {/* Background Blobs */}
+      <div className="blob blob-1"></div>
+      <div className="blob blob-2"></div>
+      <div className="blob blob-3"></div>
+
       {/* --- Top Navigation Bar --- */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 glass supports-[backdrop-filter]:bg-white/5">
         <div className="container flex items-center justify-between h-16 px-4 mx-auto">
           <div className="flex items-center gap-6">
             {/* Logo */}
-            <div className="flex items-center gap-2 cursor-pointer" onClick={goHome}>
-              <div className="flex items-center justify-center w-8 h-8 bg-indigo-600 rounded-lg">
+            <div className="flex items-center gap-2 cursor-pointer group" onClick={goHome}>
+              <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform duration-300">
                 <Play className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900">SuiFan</span>
+              <span className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-300 transition-colors">SuiFan</span>
             </div>
 
             {/* Desktop Nav */}
-            <nav className="items-center hidden gap-6 text-sm font-medium md:flex text-slate-600">
-              <button onClick={goHome} className={`hover:text-indigo-600 transition-colors ${currentView === "home" ? "text-indigo-600" : ""}`}>
+            <nav className="items-center hidden gap-6 text-sm font-medium md:flex text-slate-300">
+              <button onClick={goHome} className={`hover:text-white transition-colors ${currentView === "home" ? "text-white font-semibold" : ""}`}>
                 Découvrir
               </button>
-              <button onClick={goToCreator} className="transition-colors opacity-50 cursor-not-allowed hover:text-indigo-600" title="Demo only">
+              <button onClick={goToCreator} className="transition-colors opacity-50 cursor-not-allowed hover:text-white" title="Demo only">
                 Créateurs
               </button>
             </nav>
@@ -235,38 +240,38 @@ export default function VideoPlatformPrototype() {
 
           {/* Search Bar */}
           <div className="flex-1 hidden max-w-md mx-6 md:flex">
-            <div className="relative w-full">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
+            <div className="relative w-full group">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400 group-focus-within:text-indigo-400 transition-colors" />
               <input
                 type="text"
                 placeholder="Rechercher une vidéo, un créateur..."
-                className="w-full h-10 pl-10 pr-4 text-sm transition-all border-none rounded-full outline-none bg-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+                className="w-full h-10 pl-10 pr-4 text-sm transition-all border border-white/10 rounded-full outline-none bg-white/5 text-slate-200 placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:bg-white/10 focus:border-indigo-500/30"
               />
             </div>
           </div>
 
           {/* User Actions */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" className="hidden sm:flex" onClick={goToDashboard}>
+            <Button variant="ghost" className="hidden sm:flex text-slate-300 hover:text-white hover:bg-white/10" onClick={goToDashboard}>
               <Upload className="w-4 h-4 mr-2" />
               Créer
             </Button>
-            <Button variant="ghost" className="hidden sm:flex" onClick={goToCreateCreator}>
+            <Button variant="ghost" className="hidden sm:flex text-slate-300 hover:text-white hover:bg-white/10" onClick={goToCreateCreator}>
               <User className="w-4 h-4 mr-2" />
               Compte Créateur
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
-              <Bell className="w-5 h-5 text-slate-600" />
+            <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 text-slate-300 hover:text-white hover:bg-white/10">
+              <Bell className="w-5 h-5" />
             </Button>
             {/* Wallet connect / disconnect (ConnectButton handles both states) */}
             <div className="hidden sm:block">
               <ConnectButton />
             </div>
             <div
-              className="flex items-center justify-center transition-all bg-indigo-100 border border-indigo-200 rounded-full cursor-pointer h-9 w-9 hover:ring-2 hover:ring-indigo-500"
+              className="flex items-center justify-center transition-all bg-white/10 border border-white/10 rounded-full cursor-pointer h-9 w-9 hover:bg-indigo-600 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/30"
               onClick={goToProfile}
             >
-              <User className="w-5 h-5 text-indigo-700" />
+              <User className="w-5 h-5 text-slate-200" />
             </div>
           </div>
         </div>
