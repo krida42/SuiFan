@@ -94,10 +94,13 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({
             </div>
           </div>
           <div className="flex w-full gap-3 mb-2 md:w-auto">
-            <Button variant={isSubscribed ? "outline" : "accent"} className="flex-1 md:flex-none" onClick={handleSubscribe} disabled={isSubscribing}>
-              {isSubscribed
-                ? "Gérer l'abonnment"
-                : `S'abonner - ${activeCreator.pricePerMonth ? `${activeCreator.pricePerMonth} SUI/mois` : "Prix inconnu"}`}
+            <Button
+              variant={isSubscribed ? "outline" : "accent"}
+              className="flex-1 md:flex-none"
+              onClick={handleSubscribe}
+              disabled={isSubscribed || isSubscribing}
+            >
+              {isSubscribed ? "Abonné" : `S'abonner - ${activeCreator.pricePerMonth ? `${activeCreator.pricePerMonth} SUI/mois` : "Prix inconnu"}`}
             </Button>
           </div>
         </div>
