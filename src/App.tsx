@@ -87,8 +87,8 @@ export default function VideoPlatformPrototype() {
         id: creator.id,
         name: creator.pseudo || "Créateur",
         handle: creator.pseudo?.toLowerCase().replace(/\s+/g, "") || creator.owner,
-        avatarUrl: imageUrl || "https://placehold.co/128x128/1e40af/ffffff",
-        bannerUrl: imageUrl || "https://placehold.co/1200x400/312e81/ffffff",
+        avatarUrl: creator.image_url || imageUrl || "https://placehold.co/128x128/1e40af/ffffff",
+        bannerUrl: creator.image_url || imageUrl || "https://placehold.co/1200x400/312e81/ffffff",
         bio: creator.description || "",
         subscribers: "0",
         isVerified: false,
@@ -209,7 +209,7 @@ export default function VideoPlatformPrototype() {
   }
 
   return (
-    <div className="min-h-screen pb-20 font-sans text-slate-100 relative overflow-hidden">
+    <div className="relative min-h-screen pb-20 overflow-hidden font-sans text-slate-100">
       {/* Background Blobs */}
       <div className="blob blob-1"></div>
       <div className="blob blob-2"></div>
@@ -221,10 +221,10 @@ export default function VideoPlatformPrototype() {
           <div className="flex items-center gap-6">
             {/* Logo */}
             <div className="flex items-center gap-2 cursor-pointer group" onClick={goHome}>
-              <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform duration-300">
+              <div className="flex items-center justify-center w-8 h-8 transition-transform duration-300 rounded-lg shadow-lg bg-gradient-to-br from-indigo-500 to-violet-600 shadow-indigo-500/30 group-hover:scale-110">
                 <Play className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-300 transition-colors">SuiFan</span>
+              <span className="text-xl font-bold tracking-tight text-white transition-colors group-hover:text-indigo-300">SuiFan</span>
             </div>
 
             {/* Desktop Nav */}
@@ -245,7 +245,7 @@ export default function VideoPlatformPrototype() {
               <input
                 type="text"
                 placeholder="Rechercher une vidéo, un créateur..."
-                className="w-full h-10 pl-10 pr-4 text-sm transition-all border border-white/10 rounded-full outline-none bg-white/5 text-slate-200 placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:bg-white/10 focus:border-indigo-500/30"
+                className="w-full h-10 pl-10 pr-4 text-sm transition-all border rounded-full outline-none border-white/10 bg-white/5 text-slate-200 placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:bg-white/10 focus:border-indigo-500/30"
               />
             </div>
           </div>
@@ -268,7 +268,7 @@ export default function VideoPlatformPrototype() {
               <ConnectButton />
             </div>
             <div
-              className="flex items-center justify-center transition-all bg-white/10 border border-white/10 rounded-full cursor-pointer h-9 w-9 hover:bg-indigo-600 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/30"
+              className="flex items-center justify-center transition-all border rounded-full cursor-pointer bg-white/10 border-white/10 h-9 w-9 hover:bg-indigo-600 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/30"
               onClick={goToProfile}
             >
               <User className="w-5 h-5 text-slate-200" />
