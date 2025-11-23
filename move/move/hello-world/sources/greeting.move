@@ -123,14 +123,15 @@ module sui_fan::content_creator {
         creator: &ContentCreator,
         c: &Clock,
         ctx: &mut TxContext,
-    ): Subscription {
+    ) {
         assert!(fee.value() == creator.price_per_month, EInvalidFee);
         transfer::public_transfer(fee, creator.wallet);
-        Subscription {
+        let subscription = Subscription {
             id: object::new(ctx),
             creator_id: object::id(creator),
             created_at: c.timestamp_ms(),
-        }
+        };
+        transfer::transfer(subscription, ctx.sender());
     }
 
 
