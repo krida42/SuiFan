@@ -34,6 +34,12 @@ module sui_fan::content_creator {
     use std::string;
     use sui::table;
     // use std::unit_test::assert_eq;
+    use sui::{clock::Clock, coin::Coin, dynamic_field as df, sui::SUI};
+
+    const EInvalidCap: u64 = 0;
+    const EInvalidFee: u64 = 1;
+    const ENoAccess: u64 = 2;
+    const MARKER: u64 = 3;
 
 
     public struct AllCreators has key {
