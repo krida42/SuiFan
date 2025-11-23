@@ -1,8 +1,9 @@
-import React from "react";
-import { CheckCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { Creator } from "../types";
 import { Button } from "../components/Button";
 import { Badge } from "../components/Badge";
+import { useGetCreatorContent, CreatorContent } from "../lib/useGetCreatorContent";
 
 interface CreatorProfileViewProps {
   activeCreator: Creator;
@@ -11,6 +12,46 @@ interface CreatorProfileViewProps {
 }
 
 export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCreator, isSubscribed, handleSubscribe }) => {
+  const getCreatorContent = useGetCreatorContent();
+  const [contents, setContents] = useState<CreatorContent[]>([]);
+  const [isLoadingContents, setIsLoadingContents] = useState(false);
+  const [contentsError, setContentsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!activeCreator?.id) {
+      console.warn("CreatorProfileView mounted without a valid activeCreator.id");
+      setContents([]);
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadContents = async () => {
+      try {
+        setIsLoadingContents(true);
+        setContentsError(null);
+        const data = await getCreatorContent(activeCreator.id);
+        if (!isMounted) return;
+        setContents(data);
+      } catch (error) {
+        console.error("Erreur lors du chargement des contenus du créateur", error);
+        if (isMounted) {
+          setContentsError("Impossible de charger les contenus de ce créateur.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingContents(false);
+        }
+      }
+    };
+
+    loadContents();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeCreator.id]);
+
   return (
     <div className="duration-500 animate-in slide-in-from-bottom-4">
       {/* Cover Image */}
@@ -64,37 +105,37 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCr
       </div>
 
       {/* Creator Video Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {/* Video 1 */}
-        <div className="cursor-pointer group">
-          <div className="relative mb-3 overflow-hidden rounded-lg aspect-video bg-slate-200">
-            <img
-              src="https://placehold.co/500x280/1e1b4b/ffffff"
-              alt="Video thumbnail of a tutorial with blue overlay"
-              className="object-cover w-full h-full"
-            />
-            <div className="absolute top-2 right-2">
-              <Badge variant="premium">Abonnés</Badge>
-            </div>
+      <div className="min-h-[160px]">
+        {isLoadingContents ? (
+          <div className="flex items-center justify-center py-10 text-slate-500">
+            <Loader2 className="w-5 h-5 mr-2 text-indigo-600 animate-spin" />
+            <span>Chargement des contenus...</span>
           </div>
-          <h4 className="font-bold text-slate-900 group-hover:text-indigo-600">Workshop Privé #42</h4>
-          <p className="mt-1 text-xs text-slate-400">Il y a 2 jours</p>
-        </div>
-        {/* Video 2 */}
-        <div className="cursor-pointer group">
-          <div className="relative mb-3 overflow-hidden rounded-lg aspect-video bg-slate-200">
-            <img
-              src="https://placehold.co/500x280/4338ca/ffffff"
-              alt="Video thumbnail showing a camera setup for vlogging"
-              className="object-cover w-full h-full"
-            />
-            <div className="absolute top-2 right-2">
-              <Badge variant="free">Public</Badge>
-            </div>
+        ) : contentsError ? (
+          <p className="py-6 text-sm text-center text-red-600">{contentsError}</p>
+        ) : contents.length === 0 ? (
+          <p className="py-6 text-sm text-center text-slate-500">Aucun contenu publié pour le moment.</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {contents.map((content) => (
+              <div key={content.id} className="cursor-pointer group">
+                <div className="relative mb-3 overflow-hidden rounded-lg aspect-video bg-slate-200">
+                  <div className="flex items-center justify-center w-full h-full text-xs font-medium text-slate-500 bg-slate-100">
+                    Contenu chiffré
+                  </div>
+                  <div className="absolute top-2 right-2">
+                    <Badge variant="free">On-chain</Badge>
+                  </div>
+                </div>
+                <h4 className="font-bold text-slate-900 group-hover:text-indigo-600 line-clamp-2">{content.contentName || "Contenu sans titre"}</h4>
+                <p className="mt-1 text-xs text-slate-500 line-clamp-3">{content.contentDescription}</p>
+                <p className="mt-1 text-[10px] text-slate-400 break-all">
+                  blobId: <span className="font-mono">{content.blobId.slice(0, 10)}...</span>
+                </p>
+              </div>
+            ))}
           </div>
-          <h4 className="font-bold text-slate-900 group-hover:text-indigo-600">Mon setup caméra 2024</h4>
-          <p className="mt-1 text-xs text-slate-400">Il y a 5 jours</p>
-        </div>
+        )}
       </div>
     </div>
   );
