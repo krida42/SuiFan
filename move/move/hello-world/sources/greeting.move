@@ -40,7 +40,13 @@ module sui_fan::content_creator {
         id: UID,
         creators: table::Table<address, ID>,
     }
-    
+
+    public struct Subscription has key {
+        id: UID,
+        creator_id: ID,
+        created_at: u64,
+    }
+        
     public struct ContentCreator has key, store {
         id: UID,
         wallet: address,
@@ -103,6 +109,21 @@ module sui_fan::content_creator {
         transfer::transfer(new_content, ctx.sender());
         // new_content
         
+    }
+
+    public fun subscribe(
+        fee: Coin<SUI>,
+        creator: &ContentCreator,
+        c: &Clock,
+        ctx: &mut TxContext,
+    ): Subscription {
+        assert!(fee.value() == service.fee, EInvalidFee);
+        transfer::public_transfer(fee, service.owner);
+        Subscription {
+            id: object::new(ctx),
+            creator_id: object::id(creator),
+            created_at: c.timestamp_ms(),
+        }
     }
 
 
