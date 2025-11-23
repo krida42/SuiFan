@@ -98,7 +98,7 @@ module sui_fan::content_creator {
         };
         transfer::transfer(CreatorCap{id: object::new(ctx)}, ctx.sender());
         table::add(&mut allCreators.creators, ctx.sender(), object::uid_to_inner(&new_creator.id));
-        transfer::transfer(new_creator, ctx.sender());
+        transfer::share_object(new_creator);
 
         // new_creator
 

@@ -145,23 +145,23 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in">
       <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
-          <LayoutGrid className="w-6 h-6 text-indigo-600" />
+        <h1 className="flex items-center gap-2 text-2xl font-bold text-white">
+          <LayoutGrid className="w-6 h-6 text-indigo-400" />
           Uploader du contenu
         </h1>
         <div className="w-full md:w-72">
-          <label className="block mb-1 text-sm font-medium text-slate-700">Sélectionnez un créateur</label>
+          <label className="block mb-1 text-sm font-medium text-slate-300">Sélectionnez un créateur</label>
           <select
-            className="w-full p-2 text-sm border rounded-md outline-none border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:text-slate-400"
+            className="w-full p-2 text-sm border rounded-xl outline-none border-white/10 bg-white/5 text-slate-200 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/30 disabled:text-slate-500"
             value={selectedCreatorId}
             onChange={(event) => setSelectedCreatorId(event.target.value)}
             disabled={isLoadingCreators || creators.length === 0}
           >
-            {isLoadingCreators && <option>Chargement...</option>}
-            {!isLoadingCreators && creators.length === 0 && <option>Aucun créateur trouvé</option>}
+            {isLoadingCreators && <option className="bg-slate-900">Chargement...</option>}
+            {!isLoadingCreators && creators.length === 0 && <option className="bg-slate-900">Aucun créateur trouvé</option>}
             {!isLoadingCreators &&
               creators.map((creator) => (
-                <option key={creator.id} value={creator.id}>
+                <option key={creator.id} value={creator.id} className="bg-slate-900">
                   {creator.pseudo}
                 </option>
               ))}
@@ -171,57 +171,35 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
 
       <div className="flex justify-center">
         {/* Upload Form */}
-        <Card className="w-full max-w-2xl pt-6 border-indigo-100 shadow-md">
+        <Card className="w-full max-w-2xl pt-6 border-white/10 shadow-xl glass-panel">
           <CardContent className="p-6 space-y-5">
             <div>
-              <label className="block mb-1 text-sm font-medium text-slate-700">Titre de la vidéo</label>
+              <label className="block mb-1 text-sm font-medium text-slate-300">Titre de la vidéo</label>
               <input
                 type="text"
-                className={`w-full p-2 border rounded-md outline-none focus:ring-2 focus:border-transparent ${
-                  hasTriedSubmit && !title.trim() ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-indigo-500"
+                className={`w-full p-2 border rounded-xl outline-none bg-white/5 text-white placeholder:text-slate-500 focus:ring-2 focus:border-transparent transition-all ${
+                  hasTriedSubmit && !title.trim() ? "border-red-500/50 focus:ring-red-500/50" : "border-white/10 focus:ring-indigo-500/50"
                 }`}
                 placeholder="Ex: Tutoriel Exclusif..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
-              {hasTriedSubmit && !title.trim() && <p className="mt-1 text-xs text-red-600">Le titre est requis.</p>}
+              {hasTriedSubmit && !title.trim() && <p className="mt-1 text-xs text-red-400">Le titre est requis.</p>}
             </div>
             <div>
-              <label className="block mb-1 text-sm font-medium text-slate-700">Description</label>
+              <label className="block mb-1 text-sm font-medium text-slate-300">Description</label>
               <textarea
-                className={`w-full h-24 p-2 border rounded-md outline-none resize-none focus:ring-2 focus:border-transparent ${
-                  hasTriedSubmit && !description.trim() ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-indigo-500"
+                className={`w-full h-24 p-2 border rounded-xl outline-none resize-none bg-white/5 text-white placeholder:text-slate-500 focus:ring-2 focus:border-transparent transition-all ${
+                  hasTriedSubmit && !description.trim() ? "border-red-500/50 focus:ring-red-500/50" : "border-white/10 focus:ring-indigo-500/50"
                 }`}
                 placeholder="De quoi parle votre vidéo ?"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               ></textarea>
-              {hasTriedSubmit && !description.trim() && <p className="mt-1 text-xs text-red-600">La description est requise.</p>}
+              {hasTriedSubmit && !description.trim() && <p className="mt-1 text-xs text-red-400">La description est requise.</p>}
             </div>
 
-            {/* <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 transition-all border rounded-lg cursor-pointer border-slate-200 hover:bg-slate-50 hover:border-slate-300">
-                <div className="flex items-center gap-2 mb-2">
-                  <input type="radio" name="access" id="free" className="text-indigo-600 focus:ring-indigo-500" />
-                  <label htmlFor="free" className="font-medium text-slate-900">
-                    Gratuit
-                  </label>
-                </div>
-                <p className="ml-6 text-xs text-slate-500">Accessible à tous, idéal pour la découverte.</p>
-              </div>
-              <div className="relative p-4 border-2 border-indigo-100 rounded-lg cursor-pointer bg-indigo-50/30">
-                <div className="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full">Recommandé</div>
-                <div className="flex items-center gap-2 mb-2">
-                  <input type="radio" name="access" id="premium" defaultChecked className="text-indigo-600 focus:ring-indigo-500" />
-                  <label htmlFor="premium" className="font-medium text-slate-900">
-                    Premium / Payant
-                  </label>
-                </div>
-                <p className="ml-6 text-xs text-slate-500">Réservé aux abonnés ou achat unique.</p>
-              </div>
-            </div> */}
-
-            <label className="flex flex-col items-center justify-center gap-4 p-8 transition-colors border-2 border-dashed rounded-lg cursor-pointer border-slate-300 bg-slate-50 hover:bg-slate-100">
+            <label className="flex flex-col items-center justify-center gap-4 p-8 transition-all border-2 border-dashed rounded-xl cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 hover:border-indigo-500/30 group">
               <input
                 type="file"
                 accept="video/mp4,video/quicktime"
@@ -230,18 +208,20 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
                 disabled={!selectedCreatorId || isUploading}
               />
               <div className="text-center">
-                <Upload className="w-8 h-8 mx-auto mb-2 text-slate-400" />
-                <p className="text-sm font-medium text-slate-600">{isUploading ? "Chiffrement en cours..." : "Glisser le fichier vidéo ici"}</p>
-                <p className="text-xs text-slate-400">MP4, MOV jusqu'à 2Go</p>
+                <div className="p-3 mb-2 rounded-full bg-white/5 group-hover:bg-indigo-500/20 transition-colors inline-block">
+                  <Upload className="w-8 h-8 text-slate-400 group-hover:text-indigo-400 transition-colors" />
+                </div>
+                <p className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">{isUploading ? "Chiffrement en cours..." : "Glisser le fichier vidéo ici"}</p>
+                <p className="text-xs text-slate-500">MP4, MOV jusqu'à 2Go</p>
                 {selectedFileName && (
-                  <p className="mt-3 text-xs text-slate-500">
-                    Fichier sélectionné: <span className="font-semibold text-slate-700">{selectedFileName}</span>
+                  <p className="mt-3 text-xs text-slate-400">
+                    Fichier sélectionné: <span className="font-semibold text-indigo-300">{selectedFileName}</span>
                   </p>
                 )}
                 {hasTriedSubmit && !blobId && (
-                  <p className="mt-1 text-xs text-red-600">Un fichier doit être sélectionné et chiffré avec succès avant la mise en ligne.</p>
+                  <p className="mt-1 text-xs text-red-400">Un fichier doit être sélectionné et chiffré avec succès avant la mise en ligne.</p>
                 )}
-                {walrusError && <p className="mt-1 text-xs text-red-600">{walrusError}</p>}
+                {walrusError && <p className="mt-1 text-xs text-red-400">{walrusError}</p>}
               </div>
             </label>
 
@@ -249,19 +229,19 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
               <Button variant="accent" className="w-full" onClick={handleSubmitClick} disabled={isUploading}>
                 Mettre en ligne
               </Button>
-              {formError && <p className="mt-2 text-xs text-red-600">{formError}</p>}
+              {formError && <p className="mt-2 text-xs text-red-400">{formError}</p>}
               {(suiDigest || blobId) && (
-                <div className="mt-4 space-y-2 text-xs text-slate-700">
+                <div className="mt-4 space-y-2 text-xs text-slate-400">
                   {suiDigest && (
                     <>
                       <div className="font-mono break-all">
-                        <span className="font-semibold">Sui digest:</span> {suiDigest}
+                        <span className="font-semibold text-slate-300">Sui digest:</span> {suiDigest}
                       </div>
                       <a
                         href={`https://testnet.suivision.xyz/txblock/${suiDigest}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-indigo-600 hover:text-indigo-700 hover:underline"
+                        className="text-indigo-400 hover:text-indigo-300 hover:underline"
                       >
                         Voir la transaction Sui dans Suivision
                       </a>
@@ -270,13 +250,13 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
                   {blobId && (
                     <>
                       <div className="font-mono break-all">
-                        <span className="font-semibold">Walrus blobId:</span> {blobId}
+                        <span className="font-semibold text-slate-300">Walrus blobId:</span> {blobId}
                       </div>
                       <a
                         href={`https://walruscan.com/testnet/blob/${blobId}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-indigo-600 hover:text-indigo-700 hover:underline"
+                        className="text-indigo-400 hover:text-indigo-300 hover:underline"
                       >
                         Voir le blob sur Walrus (testnet)
                       </a>

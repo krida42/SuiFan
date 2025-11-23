@@ -47,26 +47,26 @@ export const ContentDetailView: React.FC<ContentDetailViewProps> = ({ content, c
       {/* Back button */}
       <button
         onClick={goBack}
-        className="flex items-center gap-2 mb-4 text-sm text-slate-600 hover:text-indigo-600"
+        className="flex items-center gap-2 mb-4 text-sm text-slate-400 hover:text-white transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Retour au créateur</span>
       </button>
 
       {/* Title */}
-      <h1 className="mb-2 text-2xl font-bold text-slate-900">{content.contentName || "Contenu sans titre"}</h1>
-      <p className="mb-6 text-sm text-slate-600">{content.contentDescription}</p>
+      <h1 className="mb-2 text-2xl font-bold text-white">{content.contentName || "Contenu sans titre"}</h1>
+      <p className="mb-6 text-sm text-slate-300">{content.contentDescription}</p>
 
       {/* Video area */}
-      <div className="mb-6 overflow-hidden bg-black shadow-lg aspect-video rounded-xl flex items-center justify-center">
+      <div className="mb-6 overflow-hidden bg-black shadow-2xl shadow-indigo-500/10 aspect-video rounded-xl flex items-center justify-center border border-white/10">
         {isDecrypting && !videoUrl && (
           <div className="flex items-center justify-center text-slate-300">
-            <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+            <Loader2 className="w-6 h-6 mr-2 animate-spin text-indigo-500" />
             <span>Préparation de la vidéo...</span>
           </div>
         )}
         {!isDecrypting && error && (
-          <div className="px-4 text-sm text-center text-red-500">{error}</div>
+          <div className="px-4 text-sm text-center text-red-400">{error}</div>
         )}
         {!isDecrypting && videoUrl && (
           <video
@@ -80,10 +80,10 @@ export const ContentDetailView: React.FC<ContentDetailViewProps> = ({ content, c
       </div>
 
       {/* Technical info */}
-      <div className="p-4 text-xs bg-slate-50 rounded-xl text-slate-500">
-        <div className="font-semibold text-slate-700">Informations techniques</div>
+      <div className="p-4 text-xs glass-panel rounded-xl text-slate-400 border border-white/5">
+        <div className="font-semibold text-slate-200">Informations techniques</div>
         <div className="mt-2 break-all">
-          <span className="font-mono text-[11px]">blobId: {content.blobId}</span>
+          <span className="font-mono text-[11px] text-indigo-300">blobId: {content.blobId}</span>
         </div>
       </div>
     </div>
