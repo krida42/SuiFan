@@ -64,11 +64,7 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({
     <div className="duration-500 animate-in slide-in-from-bottom-4">
       {/* Cover Image */}
       <div className="relative w-full h-48 overflow-hidden bg-indigo-900 md:h-64 rounded-t-2xl">
-        <img
-          src={activeCreator.bannerUrl || "https://placehold.co/1200x400/312e81/ffffff"}
-          alt="Artistic banner background for creator profile page showing abstract branding elements"
-          className="object-cover w-full h-full opacity-80"
-        />
+        <img className="object-cover w-full h-full opacity-80" />
       </div>
 
       {/* Profile Header */}
@@ -76,14 +72,7 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
           <div className="flex items-end gap-6 -mt-12">
             <div className="relative z-10 w-32 h-32 overflow-hidden bg-white border-4 border-white rounded-full shadow-md">
-              <img
-                src={
-                  activeCreator.avatarUrl ||
-                  "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/056bf547-5117-4821-afe5-c0c4df8e47eb.png"
-                }
-                alt="Close up portrait of the creator"
-                className="object-cover w-full h-full"
-              />
+              <img src={"https://avatar.iran.liara.run/public"} alt="Close up portrait of the creator" className="object-cover w-full h-full" />
             </div>
             <div className="mb-2">
               <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-900">

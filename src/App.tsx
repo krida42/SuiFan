@@ -89,7 +89,7 @@ export default function VideoPlatformPrototype() {
         subscribers: "0",
         isVerified: false,
         videos: [],
-        pricePerMonth: formatSuiFromMist(creator.price_per_month) ?? undefined,
+        pricePerMonth: Number(creator.price_per_month).toFixed(2) || "0",
       };
 
       setActiveCreator(mappedCreator);
@@ -300,11 +300,7 @@ export default function VideoPlatformPrototype() {
 
         {/* VIEW: CONTENT DETAIL */}
         {currentView === "content" && activeContent && activeCreator && (
-          <ContentDetailView
-            content={activeContent}
-            creatorId={activeCreator.id}
-            goBack={() => setCurrentView("creator")}
-          />
+          <ContentDetailView content={activeContent} creatorId={activeCreator.id} goBack={() => setCurrentView("creator")} />
         )}
 
         {/* VIEW: CREATOR DASHBOARD */}

@@ -3,13 +3,14 @@ import { Loader2 } from "lucide-react";
 import { Button } from "../components/Button";
 import { Card, CardContent } from "../components/Card";
 import { useGetCreators, ContentCreator } from "../lib/useGetCreators";
+import { useGetAllCreators } from "../lib/useGetAllCreators";
 
 interface HomeViewProps {
   goToCreator: (creator: ContentCreator) => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({ goToCreator }) => {
-  const getCreators = useGetCreators();
+  const getCreators = useGetAllCreators();
   const [creators, setCreators] = useState<ContentCreator[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -73,11 +74,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ goToCreator }) => {
               <CardContent className="pt-6 space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="flex-shrink-0 w-12 h-12 overflow-hidden rounded-full bg-slate-100">
-                    <img
-                      src={creator.image_url || "https://placehold.co/96x96/1e40af/ffffff"}
-                      alt={creator.pseudo}
-                      className="object-cover w-full h-full"
-                    />
+                    <img src={"https://avatar.iran.liara.run/public"} alt={creator.pseudo} className="object-cover w-full h-full" />
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-sm font-semibold truncate text-slate-900">{creator.pseudo}</h3>
