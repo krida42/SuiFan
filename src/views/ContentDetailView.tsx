@@ -1,64 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import type { CreatorContent } from "../lib/useGetCreatorContent";
+import { useDecryptCreatorContent } from "../lib/useDecryptCreatorContent";
 
 interface ContentDetailViewProps {
   content: CreatorContent;
+  creatorId: string;
   goBack: () => void;
 }
 
 /**
  * Detail page for a single uploaded content.
  *
- * For now, the encrypted blob is \"downloaded\" via a placeholder call to https://example.com,
- * then we use a demo MP4 URL to render the video.
+ * Uses Walrus + Seal to download and decrypt the encrypted blob on the client
+ * and renders the resulting `video/mp4` in a player.
  */
-export const ContentDetailView: React.FC<ContentDetailViewProps> = ({ content, goBack }) => {
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export const ContentDetailView: React.FC<ContentDetailViewProps> = ({ content, creatorId, goBack }) => {
+  const { videoUrl, isDecrypting, error, decryptContent } = useDecryptCreatorContent();
 
   useEffect(() => {
-    let isMounted = true;
-
-    const downloadToRemoteAndPrepareUrl = async () => {
+    let cancelled = false;
+    const run = async () => {
+      console.debug("[ContentDetailView] Trigger decryptContent", {
+        blobId: content.blobId,
+        creatorId,
+      });
       try {
-        setIsLoading(true);
-        setError(null);
-
-        // Placeholder: simulate sending the blobId to a remote service.
-        // In a real implementation, this would trigger a backend that decrypts
-        // the Walrus blob and makes it available as a streamed video file.
-        await fetch("https://example.com", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ blobId: content.blobId }),
-        }).catch(() => {
-          // Ignore network errors for the placeholder – we'll still show a demo video URL.
-        });
-
-        // For now, use a public sample MP4 as the playable URL.
-        const demoVideoUrl = "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
-
-        if (!isMounted) return;
-        setVideoUrl(demoVideoUrl);
+        await decryptContent({ blobId: content.blobId, creatorId });
       } catch (e) {
-        if (!isMounted) return;
-        console.error("Failed to prepare video URL for content", e);
-        setError("Impossible de charger la vidéo pour ce contenu.");
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (cancelled) return;
+        console.error("[ContentDetailView] Failed to decrypt content", e);
       }
     };
-
-    downloadToRemoteAndPrepareUrl();
-
+    run();
     return () => {
-      isMounted = false;
+      console.debug("[ContentDetailView] Cleanup effect for content", {
+        blobId: content.blobId,
+        creatorId,
+      });
+      cancelled = true;
     };
-  }, [content.blobId]);
+  }, [content.blobId, creatorId, decryptContent]);
 
   return (
     <div className="max-w-4xl mx-auto duration-300 animate-in fade-in">
@@ -77,16 +59,16 @@ export const ContentDetailView: React.FC<ContentDetailViewProps> = ({ content, g
 
       {/* Video area */}
       <div className="mb-6 overflow-hidden bg-black shadow-lg aspect-video rounded-xl flex items-center justify-center">
-        {isLoading && !videoUrl && (
+        {isDecrypting && !videoUrl && (
           <div className="flex items-center justify-center text-slate-300">
             <Loader2 className="w-6 h-6 mr-2 animate-spin" />
             <span>Préparation de la vidéo...</span>
           </div>
         )}
-        {!isLoading && error && (
+        {!isDecrypting && error && (
           <div className="px-4 text-sm text-center text-red-500">{error}</div>
         )}
-        {!isLoading && videoUrl && (
+        {!isDecrypting && videoUrl && (
           <video
             controls
             className="object-contain w-full h-full bg-black"

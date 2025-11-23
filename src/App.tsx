@@ -297,7 +297,13 @@ export default function VideoPlatformPrototype() {
         )}
 
         {/* VIEW: CONTENT DETAIL */}
-        {currentView === "content" && activeContent && <ContentDetailView content={activeContent} goBack={() => setCurrentView("creator")} />}
+        {currentView === "content" && activeContent && activeCreator && (
+          <ContentDetailView
+            content={activeContent}
+            creatorId={activeCreator.id}
+            goBack={() => setCurrentView("creator")}
+          />
+        )}
 
         {/* VIEW: CREATOR DASHBOARD */}
         {currentView === "dashboard" && <CreatorDashboardView dashboardStats={dashboardStats} handleUpload={handleUpload} />}
