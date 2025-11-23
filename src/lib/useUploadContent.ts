@@ -11,7 +11,7 @@ type UploadContentArgs = {
 };
 
 type UseUploadContentReturn = {
-  uploadContent: (args: UploadContentArgs) => Promise<void>;
+  uploadContent: (args: UploadContentArgs) => Promise<{ digest: string }>;
   isUploading: boolean;
   error: string | null;
 };
@@ -32,7 +32,7 @@ export const useUploadContent = (): UseUploadContentReturn => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const uploadContent = async ({ title, description, blobId }: UploadContentArgs): Promise<void> => {
+  const uploadContent = async ({ title, description, blobId }: UploadContentArgs): Promise<{ digest: string }> => {
     if (!currentAccount?.address) {
       throw new Error("Wallet not connected");
     }
@@ -71,15 +71,26 @@ export const useUploadContent = (): UseUploadContentReturn => {
         ],
       });
 
+      let txDigest: string | null = null;
+
       await new Promise<void>((resolve, reject) => {
         signAndExecuteTransaction(
           { transaction: tx },
           {
-            onSuccess: () => resolve(),
+            onSuccess: (result: { digest: string }) => {
+              txDigest = result.digest;
+              resolve();
+            },
             onError: (err: Error) => reject(err),
           }
         );
       });
+
+      if (!txDigest) {
+        throw new Error("Transaction digest missing after upload_content execution");
+      }
+
+      return { digest: txDigest };
     } catch (e) {
       const message = e instanceof Error ? e.message : "Unknown error while uploading content";
       setError(message);

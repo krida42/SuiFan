@@ -8,7 +8,13 @@ import { useEncryptAndPushToWalrus } from "../lib/encryptAndPushToWalrus";
 
 interface CreatorDashboardViewProps {
   dashboardStats: DashboardStats | null;
-  handleUpload: (payload: { title: string; description: string; blobId: string; creatorId: string; fileName: string | null }) => Promise<void> | void;
+  handleUpload: (payload: {
+    title: string;
+    description: string;
+    blobId: string;
+    creatorId: string;
+    fileName: string | null;
+  }) => Promise<{ digest: string }>;
 }
 
 type ContentCreator = {
@@ -31,6 +37,7 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
   const [formError, setFormError] = useState<string | null>(null);
   const [walrusError, setWalrusError] = useState<string | null>(null);
   const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
+  const [suiDigest, setSuiDigest] = useState<string | null>(null);
   const { handleSubmit: handleWalrusSubmit, isUploading } = useEncryptAndPushToWalrus();
 
   useEffect(() => {
@@ -120,13 +127,14 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
     }
 
     try {
-      await handleUpload({
+      const result = await handleUpload({
         title: trimmedTitle,
         description: trimmedDescription,
         blobId,
         creatorId: selectedCreatorId,
         fileName: selectedFileName,
       });
+      setSuiDigest(result.digest);
     } catch (error) {
       console.error("Erreur lors de la publication de la vidéo", error);
       setFormError("Erreur lors de la publication de la vidéo. Veuillez réessayer.");
@@ -138,7 +146,7 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
       <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
         <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
           <LayoutGrid className="w-6 h-6 text-indigo-600" />
-          Tableau de bord Créateur
+          Uploader du contenu
         </h1>
         <div className="w-full md:w-72">
           <label className="block mb-1 text-sm font-medium text-slate-700">Sélectionnez un créateur</label>
@@ -162,13 +170,7 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
 
       <div className="flex justify-center">
         {/* Upload Form */}
-        <Card className="w-full max-w-2xl border-indigo-100 shadow-md">
-          <div className="p-6 border-b border-slate-100 bg-indigo-50/50 rounded-t-xl">
-            <h2 className="flex items-center gap-2 font-semibold text-indigo-900">
-              <Upload className="w-4 h-4" />
-              Publier un nouveau contenu
-            </h2>
-          </div>
+        <Card className="w-full max-w-2xl pt-6 border-indigo-100 shadow-md">
           <CardContent className="p-6 space-y-5">
             <div>
               <label className="block mb-1 text-sm font-medium text-slate-700">Titre de la vidéo</label>
@@ -247,6 +249,40 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
                 Mettre en ligne
               </Button>
               {formError && <p className="mt-2 text-xs text-red-600">{formError}</p>}
+              {(suiDigest || blobId) && (
+                <div className="mt-4 space-y-2 text-xs text-slate-700">
+                  {suiDigest && (
+                    <>
+                      <div className="font-mono break-all">
+                        <span className="font-semibold">Sui digest:</span> {suiDigest}
+                      </div>
+                      <a
+                        href={`https://testnet.suivision.xyz/txblock/${suiDigest}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-indigo-600 hover:text-indigo-700 hover:underline"
+                      >
+                        Voir la transaction Sui dans Suivision
+                      </a>
+                    </>
+                  )}
+                  {blobId && (
+                    <>
+                      <div className="font-mono break-all">
+                        <span className="font-semibold">Walrus blobId:</span> {blobId}
+                      </div>
+                      <a
+                        href={`https://walruscan.com/testnet/blob/${blobId}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-indigo-600 hover:text-indigo-700 hover:underline"
+                      >
+                        Voir le blob sur Walrus (testnet)
+                      </a>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

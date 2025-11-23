@@ -1,12 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { User, Upload, Loader2 } from "lucide-react";
+import { User, Upload, Loader2, CheckCircle2 } from "lucide-react";
 import { Button } from "../components/Button";
 import { Card, CardContent } from "../components/Card";
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient, ConnectButton } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { createWalrusService } from "../lib/walrusServiceSDK";
 import { useWalrusFileUpload } from "../lib/useWalrusUpload";
-import { WalrusUpload } from "../lib/WalrusUpload";
 import { publishImageOnWalrus } from "../lib/publish_image_on_walrus";
 import { allCreatorObjectId, ContentCreatorpackageId } from "../lib/package_id";
 
@@ -23,6 +22,8 @@ export const CreateCreatorView: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [submitStep, setSubmitStep] = useState<SubmitStep>("idle");
+  const [txDigest, setTxDigest] = useState<string | null>(null);
+  const [blobId, setBlobId] = useState<string | null>(null);
   const isSubmitting = submitStep !== "idle";
 
   const walrusService = useMemo(() => {
@@ -91,9 +92,11 @@ export const CreateCreatorView: React.FC = () => {
         transaction: tx,
       },
       {
-        onSuccess: (result) => {
+        onSuccess: (result: { digest: string }) => {
           console.log("Transaction successful:", result);
-          alert("Compte créateur créé sur la blockchain !");
+          // Store transaction digest so we can show a confirmation view
+          // and link to Suivision.
+          setTxDigest(result.digest);
           setSubmitStep("idle");
         },
         onError: (error) => {
@@ -140,6 +143,7 @@ export const CreateCreatorView: React.FC = () => {
       }
 
       if (blobId) {
+        setBlobId(blobId);
         setSubmitStep("transaction");
         await createCreatorOnBlockchain({
           name,
@@ -169,14 +173,42 @@ export const CreateCreatorView: React.FC = () => {
             <p className="mt-2 text-slate-500">Configurez votre profil de créateur pour commencer à publier.</p>
           </div>
 
-          {!currentAccount ? (
+          {txDigest ? (
+            <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center">
+              <div className="flex items-center justify-center w-16 h-16 mb-2 text-green-600 bg-green-100 rounded-full">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+              <h2 className="text-xl font-semibold text-slate-900">Compte créateur créé avec succès</h2>
+              <p className="text-sm text-slate-600">Votre transaction a été confirmée sur la blockchain Sui.</p>
+              <div className="w-full max-w-md p-3 mt-2 font-mono text-xs break-all border rounded-md bg-slate-50 border-slate-200 text-slate-700">
+                <span className="font-semibold">Digest:</span> {txDigest}
+              </div>
+              <a
+                href={`https://testnet.suivision.xyz/txblock/${txDigest}`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:underline"
+              >
+                Voir la transaction dans Suivision
+              </a>
+              {blobId && (
+                <a
+                  href={`https://walruscan.com/testnet/blob/${blobId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:underline"
+                >
+                  Voir les metadata sur Walrus (testnet)
+                </a>
+              )}
+            </div>
+          ) : !currentAccount ? (
             <div className="flex flex-col items-center justify-center p-6 space-y-4 text-center border-2 border-dashed rounded-lg bg-slate-50 border-slate-200">
               <p className="text-slate-600">Veuillez connecter votre portefeuille pour continuer</p>
               <ConnectButton />
             </div>
           ) : (
             <form className="space-y-6" onSubmit={handleSubmit}>
-              <WalrusUpload />
               {/* Icon Field */}
               <div>
                 <label className="block mb-2 text-sm font-medium text-slate-700">Icone / Avatar</label>
@@ -248,7 +280,7 @@ export const CreateCreatorView: React.FC = () => {
                   />
                   <span className="absolute left-3 top-2 text-slate-500">€</span>
                 </div>
-                <p className="mt-1 text-xs text-slate-500">Vous recevrez 85% des revenus générés.</p>
+                <p className="mt-1 text-xs text-slate-500">Vous recevrez 99% des revenus générés.</p>
               </div>
 
               <div className="pt-4">

@@ -181,7 +181,7 @@ export default function VideoPlatformPrototype() {
     setIsLoading(true);
     try {
       // Publish encrypted content metadata on-chain via Move call instead of using the REST API.
-      await uploadContent({
+      const result = await uploadContent({
         title: payload.title,
         description: payload.description,
         blobId: payload.blobId,
@@ -190,6 +190,8 @@ export default function VideoPlatformPrototype() {
 
       setShowUploadToast(true);
       setTimeout(() => setShowUploadToast(false), 3000);
+
+      return result;
     } finally {
       setIsLoading(false);
     }
