@@ -137,7 +137,7 @@ module sui_fan::content_creator {
         if (object::id(creator) != sub.creator_id) {
             return false
         };
-        if (c.timestamp_ms() > sub.created_at + 60 * 60 * 24 * 30) {
+        if (c.timestamp_ms() > sub.created_at + 60 * 60 * 24 * 30 * 1000) {
             return false
         };
 
