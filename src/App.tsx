@@ -6,6 +6,7 @@ import { Button } from "./components/Button";
 import { HomeView } from "./views/HomeView";
 import { VideoPlayerView } from "./views/VideoPlayerView";
 import { CreatorProfileView } from "./views/CreatorProfileView";
+import { ContentDetailView } from "./views/ContentDetailView";
 import { CreatorDashboardView } from "./views/CreatorDashboardView";
 import { UserProfileView } from "./views/UserProfileView";
 import { CreateCreatorView } from "./views/CreateCreatorView";
@@ -13,17 +14,19 @@ import { ConnectWalletView } from "./views/ConnectWalletView";
 import { useCurrentAccount, ConnectButton } from "@mysten/dapp-kit";
 import { useUploadContent } from "./lib/useUploadContent";
 import type { ContentCreator } from "./lib/useGetCreators";
+import type { CreatorContent } from "./lib/useGetCreatorContent";
 
 // --- Main Application Component ---
 
 export default function VideoPlatformPrototype() {
   // --- State Management ---
-  const [currentView, setCurrentView] = useState("home"); // home, video, creator, dashboard, profile
+  const [currentView, setCurrentView] = useState("home"); // home, video, creator, dashboard, profile, content
   const [isLoading, setIsLoading] = useState(false);
 
   // Data State
   const [activeVideo, setActiveVideo] = useState<VideoType | null>(null);
   const [activeCreator, setActiveCreator] = useState<Creator | null>(null);
+  const [activeContent, setActiveContent] = useState<CreatorContent | null>(null);
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
 
@@ -112,6 +115,11 @@ export default function VideoPlatformPrototype() {
 
   const goToCreateCreator = () => {
     setCurrentView("createCreator");
+  };
+
+  const goToContent = (content: CreatorContent) => {
+    setActiveContent(content);
+    setCurrentView("content");
   };
 
   const handleUnlock = async () => {
@@ -253,8 +261,11 @@ export default function VideoPlatformPrototype() {
 
         {/* VIEW: CREATOR PAGE */}
         {currentView === "creator" && activeCreator && (
-          <CreatorProfileView activeCreator={activeCreator} isSubscribed={isSubscribed} handleSubscribe={handleSubscribe} />
+          <CreatorProfileView activeCreator={activeCreator} isSubscribed={isSubscribed} handleSubscribe={handleSubscribe} goToContent={goToContent} />
         )}
+
+        {/* VIEW: CONTENT DETAIL */}
+        {currentView === "content" && activeContent && <ContentDetailView content={activeContent} goBack={() => setCurrentView("creator")} />}
 
         {/* VIEW: CREATOR DASHBOARD */}
         {currentView === "dashboard" && <CreatorDashboardView dashboardStats={dashboardStats} handleUpload={handleUpload} />}

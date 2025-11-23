@@ -160,9 +160,9 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="flex justify-center">
         {/* Upload Form */}
-        <Card className="border-indigo-100 shadow-md md:col-span-2">
+        <Card className="w-full max-w-2xl border-indigo-100 shadow-md">
           <div className="p-6 border-b border-slate-100 bg-indigo-50/50 rounded-t-xl">
             <h2 className="flex items-center gap-2 font-semibold text-indigo-900">
               <Upload className="w-4 h-4" />
@@ -250,48 +250,6 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
             </div>
           </CardContent>
         </Card>
-
-        {/* Stats / Recent */}
-        <div className="space-y-6">
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="mb-4 text-sm font-medium tracking-wider uppercase text-slate-500">Vue d'ensemble</h3>
-              <div className="space-y-4">
-                <div>
-                  <div className="text-3xl font-bold text-slate-900">{dashboardStats?.revenue || "0€"}</div>
-                  <div className="text-xs font-medium text-green-600">+12% ce mois-ci</div>
-                  <div className="text-xs text-slate-400">Revenus totaux</div>
-                </div>
-                <div className="h-px bg-slate-100" />
-                <div>
-                  <div className="text-3xl font-bold text-slate-900">{dashboardStats?.subscribersCount || 0}</div>
-                  <div className="text-xs text-slate-400">Nouveaux abonnés</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="mb-4 text-sm font-medium tracking-wider uppercase text-slate-500">Derniers Uploads</h3>
-              <div className="space-y-3">
-                {dashboardStats?.recentUploads?.map((video) => (
-                  <div key={video.id} className="flex items-center gap-3">
-                    <div className="w-16 h-10 overflow-hidden rounded bg-slate-200">
-                      <img src={video.thumbnailUrl} alt={video.title} className="object-cover w-full h-full" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate text-slate-900">{video.title}</p>
-                      <p className="text-xs text-slate-500">
-                        {video.uploadedAt} • Visibilité: {video.views}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );

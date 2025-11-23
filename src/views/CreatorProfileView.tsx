@@ -9,9 +9,10 @@ interface CreatorProfileViewProps {
   activeCreator: Creator;
   isSubscribed: boolean;
   handleSubscribe: () => void;
+  goToContent: (content: CreatorContent) => void;
 }
 
-export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCreator, isSubscribed, handleSubscribe }) => {
+export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCreator, isSubscribed, handleSubscribe, goToContent }) => {
   const getCreatorContent = useGetCreatorContent();
   const [contents, setContents] = useState<CreatorContent[]>([]);
   const [isLoadingContents, setIsLoadingContents] = useState(false);
@@ -118,7 +119,7 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCr
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {contents.map((content) => (
-              <div key={content.id} className="cursor-pointer group">
+              <div key={content.id} className="cursor-pointer group" onClick={() => goToContent(content)}>
                 <div className="relative mb-3 overflow-hidden rounded-lg aspect-video bg-slate-200">
                   <div className="flex items-center justify-center w-full h-full text-xs font-medium text-slate-500 bg-slate-100">
                     Contenu chiffré
