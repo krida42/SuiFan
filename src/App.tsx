@@ -13,6 +13,8 @@ import { CreateCreatorView } from "./views/CreateCreatorView";
 import { ConnectWalletView } from "./views/ConnectWalletView";
 import { useCurrentAccount, ConnectButton } from "@mysten/dapp-kit";
 import { useUploadContent } from "./lib/useUploadContent";
+import { useSubscribeToCreator } from "./lib/useSubscribeToCreator";
+import { useUserSubscriptions } from "./lib/useUserSubscriptions";
 import type { ContentCreator } from "./lib/useGetCreators";
 import type { CreatorContent } from "./lib/useGetCreatorContent";
 
@@ -37,6 +39,19 @@ export default function VideoPlatformPrototype() {
   const currentAccount = useCurrentAccount();
   const isWalletConnected = Boolean(currentAccount?.address);
   const { uploadContent } = useUploadContent();
+  const { subscribeToCreator, isSubscribing } = useSubscribeToCreator();
+  const { subscriptions, refetch: refetchSubscriptions } = useUserSubscriptions();
+
+  const formatSuiFromMist = (value: string | number | bigint | null | undefined): string | null => {
+    if (value === null || value === undefined) return null;
+    try {
+      const big = BigInt(value);
+      const sui = Number(big) / 1_000_000_000;
+      return sui.toFixed(2);
+    } catch {
+      return null;
+    }
+  };
 
   // --- Initial Load ---
   useEffect(() => {
@@ -74,10 +89,10 @@ export default function VideoPlatformPrototype() {
         subscribers: "0",
         isVerified: false,
         videos: [],
+        pricePerMonth: formatSuiFromMist(creator.price_per_month) ?? undefined,
       };
 
       setActiveCreator(mappedCreator);
-      setIsSubscribed(currentUser?.subscribedCreatorIds.includes(mappedCreator.id) || false);
       setCurrentView("creator");
       return;
     }
@@ -89,8 +104,6 @@ export default function VideoPlatformPrototype() {
     try {
       const creator = await api.getCreator(name);
       setActiveCreator(creator);
-      // Check subscription status
-      setIsSubscribed(currentUser?.subscribedCreatorIds.includes(creator.id) || false);
       setCurrentView("creator");
     } finally {
       setIsLoading(false);
@@ -122,6 +135,16 @@ export default function VideoPlatformPrototype() {
     setCurrentView("content");
   };
 
+  useEffect(() => {
+    if (!activeCreator) {
+      setIsSubscribed(false);
+      return;
+    }
+
+    const subscribed = subscriptions.some((sub) => sub.creatorId === activeCreator.id);
+    setIsSubscribed(subscribed);
+  }, [activeCreator, subscriptions]);
+
   const handleUnlock = async () => {
     if (activeVideo && currentUser) {
       setIsUnlocking(true);
@@ -143,10 +166,13 @@ export default function VideoPlatformPrototype() {
   };
 
   const handleSubscribe = async () => {
-    if (activeCreator) {
-      setIsLoading(true);
-      await api.subscribeToCreator(activeCreator.id);
-      setIsSubscribed(true);
+    if (!activeCreator) return;
+
+    setIsLoading(true);
+    try {
+      await subscribeToCreator({ creatorId: activeCreator.id });
+      await refetchSubscriptions();
+    } finally {
       setIsLoading(false);
     }
   };
@@ -251,7 +277,7 @@ export default function VideoPlatformPrototype() {
             activeVideo={activeVideo}
             currentUser={currentUser}
             isSubscribed={isSubscribed}
-            isUnlocking={isUnlocking}
+            isUnlocking={isUnlocking || isSubscribing}
             goHome={goHome}
             goToCreator={goToCreator}
             handleUnlock={handleUnlock}
@@ -261,7 +287,13 @@ export default function VideoPlatformPrototype() {
 
         {/* VIEW: CREATOR PAGE */}
         {currentView === "creator" && activeCreator && (
-          <CreatorProfileView activeCreator={activeCreator} isSubscribed={isSubscribed} handleSubscribe={handleSubscribe} goToContent={goToContent} />
+          <CreatorProfileView
+            activeCreator={activeCreator}
+            isSubscribed={isSubscribed}
+            isSubscribing={isSubscribing}
+            handleSubscribe={handleSubscribe}
+            goToContent={goToContent}
+          />
         )}
 
         {/* VIEW: CONTENT DETAIL */}

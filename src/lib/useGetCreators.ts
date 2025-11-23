@@ -7,6 +7,8 @@ export type ContentCreator = {
   description: string;
   owner: string;
   image_url: string;
+  // Raw on-chain price per month (u64 in MIST, usually serialized as a string)
+  price_per_month: string;
 };
 
 export const useGetCreators = () => {
@@ -40,6 +42,7 @@ export const useGetCreators = () => {
           // The Move struct exposes `wallet: address`; we surface it as `owner` in the UI.
           owner: fields?.wallet,
           image_url: fields?.image_url,
+          price_per_month: String(fields?.price_per_month ?? "0"),
         };
       })
       .filter((item) => item !== null) as ContentCreator[];

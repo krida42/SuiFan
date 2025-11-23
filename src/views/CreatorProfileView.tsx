@@ -8,11 +8,18 @@ import { useGetCreatorContent, CreatorContent } from "../lib/useGetCreatorConten
 interface CreatorProfileViewProps {
   activeCreator: Creator;
   isSubscribed: boolean;
+  isSubscribing: boolean;
   handleSubscribe: () => void;
   goToContent: (content: CreatorContent) => void;
 }
 
-export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCreator, isSubscribed, handleSubscribe, goToContent }) => {
+export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({
+  activeCreator,
+  isSubscribed,
+  isSubscribing,
+  handleSubscribe,
+  goToContent,
+}) => {
   const getCreatorContent = useGetCreatorContent();
   const [contents, setContents] = useState<CreatorContent[]>([]);
   const [isLoadingContents, setIsLoadingContents] = useState(false);
@@ -87,8 +94,10 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCr
             </div>
           </div>
           <div className="flex w-full gap-3 mb-2 md:w-auto">
-            <Button variant={isSubscribed ? "outline" : "accent"} className="flex-1 md:flex-none" onClick={handleSubscribe}>
-              {isSubscribed ? "Gérer l'abonnment" : "S'abonner - 9.99€/mois"}
+            <Button variant={isSubscribed ? "outline" : "accent"} className="flex-1 md:flex-none" onClick={handleSubscribe} disabled={isSubscribing}>
+              {isSubscribed
+                ? "Gérer l'abonnment"
+                : `S'abonner - ${activeCreator.pricePerMonth ? `${activeCreator.pricePerMonth} SUI/mois` : "Prix inconnu"}`}
             </Button>
           </div>
         </div>

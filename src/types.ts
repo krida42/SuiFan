@@ -25,6 +25,8 @@ export interface Creator {
   subscribers: string;
   isVerified: boolean;
   videos?: Video[];
+  // Human-readable monthly price in SUI (e.g. "0.01"), derived from on-chain data.
+  pricePerMonth?: string;
 }
 
 export interface User {
