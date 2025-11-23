@@ -9,6 +9,8 @@ import { CreatorProfileView } from "./views/CreatorProfileView";
 import { CreatorDashboardView } from "./views/CreatorDashboardView";
 import { UserProfileView } from "./views/UserProfileView";
 import { CreateCreatorView } from "./views/CreateCreatorView";
+import { ConnectWalletView } from "./views/ConnectWalletView";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 
 // --- Main Application Component ---
 
@@ -28,6 +30,8 @@ export default function VideoPlatformPrototype() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [showUploadToast, setShowUploadToast] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
+  const currentAccount = useCurrentAccount();
+  const isWalletConnected = Boolean(currentAccount?.address);
 
   // --- Initial Load ---
   useEffect(() => {
@@ -151,6 +155,10 @@ export default function VideoPlatformPrototype() {
 
   // --- Mock Data Helpers ---
   // Note: In a real app this would be dynamic. Here we define specific items for the demo.
+
+  if (!isWalletConnected) {
+    return <ConnectWalletView />;
+  }
 
   return (
     <div className="min-h-screen pb-20 font-sans bg-slate-50 text-slate-900">

@@ -3,8 +3,11 @@ import { User, Upload, Loader2 } from "lucide-react";
 import { Button } from "../components/Button";
 import { Card, CardContent } from "../components/Card";
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient, ConnectButton } from "@mysten/dapp-kit";
+import { Transaction } from "@mysten/sui/transactions";
 import { createWalrusService } from "../lib/walrusServiceSDK";
 import { useWalrusFileUpload } from "../lib/useWalrusUpload";
+import { WalrusUpload } from "../lib/WalrusUpload";
+import { publishImageOnWalrus } from "../lib/publish_image_on_walrus";
 
 export const CreateCreatorView: React.FC = () => {
   const currentAccount = useCurrentAccount();
@@ -14,8 +17,12 @@ export const CreateCreatorView: React.FC = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [subscribePrice, setSubscribePrice] = useState("");
+  type SubmitStep = "idle" | "uploading" | "transaction";
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [submitStep, setSubmitStep] = useState<SubmitStep>("idle");
+  const isSubmitting = submitStep !== "idle";
 
   const walrusService = useMemo(() => {
     return createWalrusService({
@@ -24,7 +31,7 @@ export const CreateCreatorView: React.FC = () => {
     });
   }, []);
 
-  const { uploadFile, uploading, error, success } = useWalrusFileUpload({
+  const { uploading, error, success } = useWalrusFileUpload({
     walrus: walrusService,
     currentAccount,
     signAndExecute: signAndExecuteTransaction,
@@ -53,8 +60,48 @@ export const CreateCreatorView: React.FC = () => {
     });
   };
 
+  const createCreatorOnBlockchain = async ({
+    name,
+    description,
+    subscribePrice,
+    blobId,
+  }: {
+    name: string;
+    description: string;
+    subscribePrice: string;
+    blobId: string;
+  }) => {
+    const tx = new Transaction();
+    const image_url = `https://aggregator.walrus-testnet.walrus.space/v1/${blobId}`;
+
+    tx.moveCall({
+      target: "0x2f810ea3d93368e4ec19ecdb591caef8e4f22b0c7e8dfdb9c40fb53e200e56d3::content_creator::new",
+      arguments: [tx.pure.string(name), tx.pure.u64(Math.floor(parseFloat(subscribePrice))), tx.pure.string(description), tx.pure.string(image_url)],
+    });
+
+    await signAndExecuteTransaction(
+      {
+        transaction: tx,
+      },
+      {
+        onSuccess: (result) => {
+          console.log("Transaction successful:", result);
+          alert("Compte créateur créé sur la blockchain !");
+          setSubmitStep("idle");
+        },
+        onError: (error) => {
+          console.error("Transaction failed:", error);
+          alert("Erreur lors de la création sur la blockchain: " + error.message);
+          setSubmitStep("idle");
+        },
+      }
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (uploading || isSubmitting) return;
 
     if (!selectedFile) {
       alert("Veuillez choisir une image.");
@@ -62,6 +109,7 @@ export const CreateCreatorView: React.FC = () => {
     }
 
     try {
+      setSubmitStep("uploading");
       const base64Image = await fileToBase64(selectedFile);
 
       const profileData = {
@@ -74,10 +122,31 @@ export const CreateCreatorView: React.FC = () => {
       const jsonString = JSON.stringify(profileData);
       const jsonFile = new File([jsonString], "creator_profile.json", { type: "application/json" });
 
-      await uploadFile(jsonFile);
+      const response = await publishImageOnWalrus(new Uint8Array(await jsonFile.arrayBuffer()));
+      console.log("Response from Walrus:", response);
+
+      let blobId = "";
+      if (response.newlyCreated) {
+        blobId = response.newlyCreated.blobObject.blobId;
+      } else if (response.alreadyCertified) {
+        blobId = response.alreadyCertified.blobId;
+      }
+
+      if (blobId) {
+        setSubmitStep("transaction");
+        await createCreatorOnBlockchain({
+          name,
+          description,
+          subscribePrice,
+          blobId,
+        });
+      } else {
+        throw new Error("No blobId returned from Walrus");
+      }
     } catch (err) {
       console.error("Error preparing upload:", err);
       alert("Erreur lors de la préparation de l'upload.");
+      setSubmitStep("idle");
     }
   };
 
@@ -100,6 +169,7 @@ export const CreateCreatorView: React.FC = () => {
             </div>
           ) : (
             <form className="space-y-6" onSubmit={handleSubmit}>
+              <WalrusUpload />
               {/* Icon Field */}
               <div>
                 <label className="block mb-2 text-sm font-medium text-slate-700">Icone / Avatar</label>
@@ -175,10 +245,15 @@ export const CreateCreatorView: React.FC = () => {
               </div>
 
               <div className="pt-4">
-                <Button variant="primary" className="w-full py-6 text-lg" type="submit" disabled={uploading}>
-                  {uploading ? (
+                <Button variant="primary" className="w-full py-6 text-lg" type="submit" disabled={uploading || isSubmitting}>
+                  {uploading || isSubmitting ? (
                     <span className="flex items-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" /> Création en cours...
+                      <Loader2 className="w-5 h-5 animate-spin" />{" "}
+                      {submitStep === "uploading"
+                        ? "Upload de l'image..."
+                        : submitStep === "transaction"
+                        ? "Transaction en cours..."
+                        : "Création en cours..."}
                     </span>
                   ) : (
                     "Créer mon compte Créateur"

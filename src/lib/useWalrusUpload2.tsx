@@ -1,7 +1,7 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCurrentAccount, useDAppKit, useSuiClient } from "@mysten/dapp-kit";
+import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { useState, useRef } from "react";
 
 import type { WalrusClient, WriteFilesFlow } from "@mysten/walrus";
@@ -9,10 +9,10 @@ import { WalrusFile } from "@mysten/walrus";
 import type { SuiClient } from "@mysten/sui/client";
 
 export function FileUpload({ onComplete }: { onComplete: (ids: string[]) => void }) {
-  const dAppKit = useDAppKit();
   const currentAccount = useCurrentAccount();
   const suiClient = useSuiClient() as SuiClient & { walrus: WalrusClient };
   const flowRef = useRef<WriteFilesFlow | null>(null);
+  const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const [state, setState] = useState<"empty" | "encoding" | "encoded" | "registering" | "uploading" | "uploaded" | "certifying" | "done">("empty");
 
   if (!currentAccount) {
@@ -69,7 +69,7 @@ export function FileUpload({ onComplete }: { onComplete: (ids: string[]) => void
       deletable: true,
     });
 
-    const { digest } = await dAppKit.signAndExecuteTransaction({
+    const { digest } = await signAndExecuteTransaction({
       transaction: registerBlobTransaction,
     });
     setState("uploading");
