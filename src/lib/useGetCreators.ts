@@ -1,19 +1,19 @@
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import { ContentCreatorpackageId } from "./package_id";
 
+export type ContentCreator = {
+  id: string;
+  pseudo: string;
+  description: string;
+  owner: string;
+  image_url: string;
+};
+
 export const useGetCreators = () => {
   const suiClient = useSuiClient();
   const currentAccount = useCurrentAccount();
 
-  type ContentCreator = {
-    id: string;
-    pseudo: string;
-    description: string;
-    owner: string;
-    image_url: string;
-  };
-
-  return async function getCreators() {
+  return async function getCreators(): Promise<ContentCreator[]> {
     if (!currentAccount?.address) {
       console.warn("getCreators called without a connected Sui account; returning empty list.");
       return [];

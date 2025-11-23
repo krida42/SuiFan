@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Bell, User, Play, Upload, CheckCircle } from "lucide-react";
 import { api } from "./services/api";
-import { Video as VideoType, Creator, User as UserType, DashboardStats } from "./types";
+import { Creator, User as UserType, DashboardStats, Video as VideoType } from "./types";
 import { Button } from "./components/Button";
 import { HomeView } from "./views/HomeView";
 import { VideoPlayerView } from "./views/VideoPlayerView";
@@ -12,6 +12,7 @@ import { CreateCreatorView } from "./views/CreateCreatorView";
 import { ConnectWalletView } from "./views/ConnectWalletView";
 import { useCurrentAccount, ConnectButton } from "@mysten/dapp-kit";
 import { useUploadContent } from "./lib/useUploadContent";
+import type { ContentCreator } from "./lib/useGetCreators";
 
 // --- Main Application Component ---
 
@@ -21,7 +22,6 @@ export default function VideoPlatformPrototype() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Data State
-  const [videos, setVideos] = useState<VideoType[]>([]);
   const [activeVideo, setActiveVideo] = useState<VideoType | null>(null);
   const [activeCreator, setActiveCreator] = useState<Creator | null>(null);
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
@@ -40,8 +40,7 @@ export default function VideoPlatformPrototype() {
     const init = async () => {
       setIsLoading(true);
       try {
-        const [videosData, userData] = await Promise.all([api.getVideos(), api.getCurrentUser()]);
-        setVideos(videosData);
+        const userData = await api.getCurrentUser();
         setCurrentUser(userData);
       } catch (error) {
         console.error("Failed to load initial data", error);
@@ -53,33 +52,35 @@ export default function VideoPlatformPrototype() {
   }, []);
 
   // --- Navigation Handlers ---
-  const goHome = async () => {
-    setIsLoading(true);
-    const vids = await api.getVideos();
-    setVideos(vids);
+  const goHome = () => {
     setCurrentView("home");
-    setIsLoading(false);
   };
 
-  const goToVideo = async (videoPreview: any) => {
-    setIsLoading(true);
-    try {
-      const fullVideo = await api.getVideoById(videoPreview.id);
-      if (fullVideo) {
-        setActiveVideo(fullVideo);
-        // In a real app, we might fetch this status from the backend specifically
-        setCurrentView("video");
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
+  const goToCreator = async (creatorOrName: string | ContentCreator | any) => {
+    // If we receive a ContentCreator from on-chain data, map it directly
+    if (creatorOrName && typeof creatorOrName === "object" && "id" in creatorOrName && "pseudo" in creatorOrName) {
+      const creator = creatorOrName as ContentCreator;
+
+      const mappedCreator: Creator = {
+        id: creator.id,
+        name: creator.pseudo || "Créateur",
+        handle: creator.pseudo?.toLowerCase().replace(/\s+/g, "") || creator.owner,
+        avatarUrl: creator.image_url || "https://placehold.co/128x128/1e40af/ffffff",
+        bannerUrl: creator.image_url || "https://placehold.co/1200x400/312e81/ffffff",
+        bio: creator.description || "",
+        subscribers: "0",
+        isVerified: false,
+        videos: [],
+      };
+
+      setActiveCreator(mappedCreator);
+      setIsSubscribed(currentUser?.subscribedCreatorIds.includes(mappedCreator.id) || false);
+      setCurrentView("creator");
+      return;
     }
-  };
 
-  const goToCreator = async (creatorName: string | any) => {
-    // Handle event object if passed directly
-    const name = typeof creatorName === "string" ? creatorName : "Sophie Tech";
+    // Fallback: legacy demo flow using mocked API by creator name
+    const name = typeof creatorOrName === "string" ? creatorOrName : "Sophie Tech";
 
     setIsLoading(true);
     try {
@@ -234,7 +235,7 @@ export default function VideoPlatformPrototype() {
       {/* --- Main Content Area --- */}
       <main className="container px-4 py-8 mx-auto">
         {/* VIEW: HOME */}
-        {currentView === "home" && <HomeView videos={videos} isLoading={isLoading} goToVideo={goToVideo} />}
+        {currentView === "home" && <HomeView goToCreator={goToCreator} />}
 
         {/* VIEW: VIDEO PLAYER */}
         {currentView === "video" && activeVideo && (

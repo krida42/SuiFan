@@ -16,7 +16,7 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCr
       {/* Cover Image */}
       <div className="relative w-full h-48 overflow-hidden bg-indigo-900 md:h-64 rounded-t-2xl">
         <img
-          src="https://placehold.co/1200x400/312e81/ffffff"
+          src={activeCreator.bannerUrl || "https://placehold.co/1200x400/312e81/ffffff"}
           alt="Artistic banner background for creator profile page showing abstract branding elements"
           className="object-cover w-full h-full opacity-80"
         />
@@ -28,7 +28,10 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCr
           <div className="flex items-end gap-6 -mt-12">
             <div className="relative z-10 w-32 h-32 overflow-hidden bg-white border-4 border-white rounded-full shadow-md">
               <img
-                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/056bf547-5117-4821-afe5-c0c4df8e47eb.png"
+                src={
+                  activeCreator.avatarUrl ||
+                  "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/056bf547-5117-4821-afe5-c0c4df8e47eb.png"
+                }
                 alt="Close up portrait of the creator"
                 className="object-cover w-full h-full"
               />
@@ -96,4 +99,3 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({ activeCr
     </div>
   );
 };
-
