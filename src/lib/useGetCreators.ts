@@ -14,6 +14,11 @@ export const useGetCreators = () => {
   };
 
   return async function getCreators() {
+    if (!currentAccount?.address) {
+      console.warn("getCreators called without a connected Sui account; returning empty list.");
+      return [];
+    }
+
     // get all owned cap objects
     const res = await suiClient.getOwnedObjects({
       owner: currentAccount?.address!,

@@ -10,7 +10,8 @@ import { CreatorDashboardView } from "./views/CreatorDashboardView";
 import { UserProfileView } from "./views/UserProfileView";
 import { CreateCreatorView } from "./views/CreateCreatorView";
 import { ConnectWalletView } from "./views/ConnectWalletView";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount, ConnectButton } from "@mysten/dapp-kit";
+import { useUploadContent } from "./lib/useUploadContent";
 
 // --- Main Application Component ---
 
@@ -32,6 +33,7 @@ export default function VideoPlatformPrototype() {
   const [isUnlocking, setIsUnlocking] = useState(false);
   const currentAccount = useCurrentAccount();
   const isWalletConnected = Boolean(currentAccount?.address);
+  const { uploadContent } = useUploadContent();
 
   // --- Initial Load ---
   useEffect(() => {
@@ -142,21 +144,20 @@ export default function VideoPlatformPrototype() {
 
   const handleUpload = async (payload: { title: string; description: string; blobId: string; creatorId: string; fileName: string | null }) => {
     setIsLoading(true);
+    try {
+      // Publish encrypted content metadata on-chain via Move call instead of using the REST API.
+      await uploadContent({
+        title: payload.title,
+        description: payload.description,
+        blobId: payload.blobId,
+        creatorId: payload.creatorId,
+      });
 
-    const formData = new FormData();
-    formData.append("title", payload.title);
-    formData.append("description", payload.description);
-    formData.append("blobId", payload.blobId);
-    formData.append("creatorId", payload.creatorId);
-    if (payload.fileName) {
-      formData.append("fileName", payload.fileName);
+      setShowUploadToast(true);
+      setTimeout(() => setShowUploadToast(false), 3000);
+    } finally {
+      setIsLoading(false);
     }
-
-    await api.uploadVideo(formData);
-
-    setShowUploadToast(true);
-    setIsLoading(false);
-    setTimeout(() => setShowUploadToast(false), 3000);
   };
 
   // --- Mock Data Helpers ---
@@ -216,6 +217,10 @@ export default function VideoPlatformPrototype() {
             <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
               <Bell className="w-5 h-5 text-slate-600" />
             </Button>
+            {/* Wallet connect / disconnect (ConnectButton handles both states) */}
+            <div className="hidden sm:block">
+              <ConnectButton />
+            </div>
             <div
               className="flex items-center justify-center transition-all bg-indigo-100 border border-indigo-200 rounded-full cursor-pointer h-9 w-9 hover:ring-2 hover:ring-indigo-500"
               onClick={goToProfile}
