@@ -33,27 +33,13 @@
 module sui_fan::content_creator {
     use std::string;
     use sui::table;
-    // use std::unit_test::assert_eq;
-    use sui::{clock::Clock, coin::Coin, sui::SUI};
-    // use sui::{clock::Clock, coin::Coin, dynamic_field as df, sui::SUI};
-
-    // const EInvalidCap: u64 = 0;
-    const EInvalidFee: u64 = 1;
-    // const ENoAccess: u64 = 2;
-    // const MARKER: u64 = 3;
 
 
     public struct AllCreators has key {
         id: UID,
         creators: table::Table<address, ID>,
     }
-
-    public struct Subscription has key {
-        id: UID,
-        creator_id: ID,
-        created_at: u64,
-    }
-        
+    
     public struct ContentCreator has key, store {
         id: UID,
         wallet: address,
@@ -61,17 +47,6 @@ module sui_fan::content_creator {
         price_per_month: u64,
         description: string::String,
         image_url: string::String,
-    }
-
-    public struct Content has key {
-        id: UID,
-        content_name: string::String,
-        content_description: string::String,
-        blob_id: string::String,
-    }
-
-    public struct CreatorCap has key {
-        id: UID,
     }
 
     fun init(ctx: &mut TxContext) {
@@ -86,8 +61,8 @@ module sui_fan::content_creator {
     //     target: "sui_fan::content_creator::new",
     //     arguments: [tx.object(creator_list), tx.string(pseudo), tx.pure.u64(price_per_month), tx.string(description), tx.string(image_url)],
     // } 
-#[allow(lint(self_transfer))]
-    public fun new(allCreators: &mut AllCreators, pseudo: string::String, price_per_month: u64, description: string::String, image_url: string::String, ctx: &mut TxContext)  { 
+
+    public fun new(allCreators: &mut AllCreators, pseudo: string::String, price_per_month: u64, description: string::String, image_url: string::String, ctx: &mut TxContext) : ContentCreator { 
         let new_creator = ContentCreator {
             id: object::new(ctx),
             pseudo,
@@ -96,41 +71,9 @@ module sui_fan::content_creator {
             image_url,
             wallet: ctx.sender(),
         };
-        transfer::transfer(CreatorCap{id: object::new(ctx)}, ctx.sender());
         table::add(&mut allCreators.creators, ctx.sender(), object::uid_to_inner(&new_creator.id));
-        transfer::transfer(new_creator, ctx.sender());
+        new_creator
 
-        // new_creator
-
-    }
-
-    public fun upload_content(_cap: &CreatorCap, content_name: string::String, content_description: string::String, blob_id: string::String, ctx: &mut TxContext){
-        // check if ctx.sender() is a registered creator?
-        let new_content = Content {
-            id: object::new(ctx),
-            content_name,
-            content_description,
-            blob_id,
-        };
-
-        transfer::transfer(new_content, ctx.sender());
-        // new_content
-        
-    }
-
-    public fun subscribe(
-        fee: Coin<SUI>,
-        creator: &ContentCreator,
-        c: &Clock,
-        ctx: &mut TxContext,
-    ): Subscription {
-        assert!(fee.value() == creator.price_per_month, EInvalidFee);
-        transfer::public_transfer(fee, creator.wallet);
-        Subscription {
-            id: object::new(ctx),
-            creator_id: object::id(creator),
-            created_at: c.timestamp_ms(),
-        }
     }
 
 
