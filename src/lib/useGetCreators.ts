@@ -44,7 +44,7 @@ export const useGetCreators = () => {
           description: fields?.description,
           // The Move struct exposes `wallet: address`; we surface it as `owner` in the UI.
           owner: fields?.wallet,
-          image_url: imageUrl as string,
+          image_url: fields?.image_url || (imageUrl as string),
           price_per_month: String(fields?.price_per_month ?? "0"),
         };
       })

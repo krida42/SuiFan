@@ -1,66 +1,23 @@
-import React, { useMemo, useState } from "react";
-import { User, Upload, Loader2, CheckCircle2 } from "lucide-react";
+import React, { useState } from "react";
+import { User, Loader2, CheckCircle2 } from "lucide-react";
 import { Button } from "../components/Button";
 import { Card, CardContent } from "../components/Card";
-import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient, ConnectButton } from "@mysten/dapp-kit";
+import { useCurrentAccount, useSignAndExecuteTransaction, ConnectButton } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
-import { createWalrusService } from "../lib/walrusServiceSDK";
-import { useWalrusFileUpload } from "../lib/useWalrusUpload";
-import { publishImageOnWalrus } from "../lib/publish_image_on_walrus";
 import { allCreatorObjectId, ContentCreatorpackageId } from "../lib/package_id";
 
 export const CreateCreatorView: React.FC = () => {
   const currentAccount = useCurrentAccount();
-  const suiClient = useSuiClient();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [subscribePrice, setSubscribePrice] = useState("");
-  type SubmitStep = "idle" | "uploading" | "transaction";
-
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState("");
+  type SubmitStep = "idle" | "transaction";
   const [submitStep, setSubmitStep] = useState<SubmitStep>("idle");
   const [txDigest, setTxDigest] = useState<string | null>(null);
-  const [blobId, setBlobId] = useState<string | null>(null);
   const isSubmitting = submitStep !== "idle";
-
-  const walrusService = useMemo(() => {
-    return createWalrusService({
-      network: "testnet",
-      epochs: 10,
-    });
-  }, []);
-
-  const { uploading, error, success } = useWalrusFileUpload({
-    walrus: walrusService,
-    currentAccount,
-    signAndExecute: signAndExecuteTransaction,
-    suiClient,
-    onSuccess: (item) => {
-      console.log("Profile JSON uploaded:", item.url);
-      // Reset form or navigate away
-      alert(`Compte créateur créé ! Metadata: ${item.url}`);
-    },
-  });
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  };
-
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
 
   const createCreatorOnBlockchain = async ({
     name,
@@ -74,7 +31,6 @@ export const CreateCreatorView: React.FC = () => {
     blobId: string;
   }) => {
     const tx = new Transaction();
-    const image_url = `https://aggregator.walrus-testnet.walrus.space/v1/${blobId}`;
 
     tx.moveCall({
       target: `${ContentCreatorpackageId}::content_creator::new`,
@@ -83,7 +39,7 @@ export const CreateCreatorView: React.FC = () => {
         tx.pure.string(name),
         tx.pure.u64(Math.floor(parseFloat(subscribePrice))),
         tx.pure.string(description),
-        tx.pure.string(image_url),
+        tx.pure.string(blobId),
       ],
     });
 
@@ -111,52 +67,24 @@ export const CreateCreatorView: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (uploading || isSubmitting) return;
+    if (isSubmitting) return;
 
-    if (!selectedFile) {
-      alert("Veuillez choisir une image.");
+    if (!imageUrl) {
+      alert("Veuillez saisir une URL d'image.");
       return;
     }
 
     try {
-      setSubmitStep("uploading");
-      const base64Image = await fileToBase64(selectedFile);
-
-      const profileData = {
-        Name: name,
-        Description: description,
-        IconImage: base64Image,
-        SubscribePrice: subscribePrice,
-      };
-
-      const jsonString = JSON.stringify(profileData);
-      const jsonFile = new File([jsonString], "creator_profile.json", { type: "application/json" });
-
-      const response = await publishImageOnWalrus(new Uint8Array(await jsonFile.arrayBuffer()));
-      console.log("Response from Walrus:", response);
-
-      let blobId = "";
-      if (response.newlyCreated) {
-        blobId = response.newlyCreated.blobObject.blobId;
-      } else if (response.alreadyCertified) {
-        blobId = response.alreadyCertified.blobId;
-      }
-
-      if (blobId) {
-        setBlobId(blobId);
-        setSubmitStep("transaction");
-        await createCreatorOnBlockchain({
-          name,
-          description,
-          subscribePrice,
-          blobId,
-        });
-      } else {
-        throw new Error("No blobId returned from Walrus");
-      }
+      setSubmitStep("transaction");
+      await createCreatorOnBlockchain({
+        name,
+        description,
+        subscribePrice,
+        blobId: imageUrl,
+      });
     } catch (err) {
       console.error("Error preparing upload:", err);
-      alert("Erreur lors de la préparation de l'upload.");
+      alert("Erreur lors de la création sur la blockchain.");
       setSubmitStep("idle");
     }
   };
@@ -191,14 +119,14 @@ export const CreateCreatorView: React.FC = () => {
               >
                 Voir la transaction dans Suivision
               </a>
-              {blobId && (
+              {imageUrl && (
                 <a
-                  href={`https://walruscan.com/testnet/blob/${blobId}`}
+                  href={imageUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:underline"
                 >
-                  Voir les metadata sur Walrus (testnet)
+                  Voir l'image
                 </a>
               )}
             </div>
@@ -211,31 +139,23 @@ export const CreateCreatorView: React.FC = () => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Icon Field */}
               <div>
-                <label className="block mb-2 text-sm font-medium text-slate-700">Icone / Avatar</label>
+                <label className="block mb-2 text-sm font-medium text-slate-700">URL de l'image / Avatar</label>
                 <div className="flex items-center gap-4">
                   <div className="relative flex items-center justify-center w-20 h-20 overflow-hidden border-2 border-dashed rounded-full bg-slate-100 border-slate-300">
-                    {previewUrl ? (
-                      <img src={previewUrl} alt="Avatar" className="object-cover w-full h-full" />
+                    {imageUrl ? (
+                      <img src={imageUrl} alt="Avatar" className="object-cover w-full h-full" />
                     ) : (
-                      <Upload className="w-6 h-6 text-slate-400" />
+                      <span className="px-2 text-xs text-center text-slate-400">Aperçu de l'image</span>
                     )}
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      variant="outline"
-                      type="button"
-                      onClick={(e: React.MouseEvent) => {
-                        e.preventDefault();
-                        document.getElementById("icon-upload")?.click();
-                      }}
-                      disabled={uploading}
-                    >
-                      {uploading ? "Upload en cours..." : "Choisir une image"}
-                    </Button>
-                    {error && <span className="text-xs text-red-500">{error}</span>}
-                    {success && <span className="text-xs text-green-500">Profil créé avec succès !</span>}
-                  </div>
-                  <input type="file" id="icon-upload" className="hidden" accept="image/*" onChange={handleFileChange} />
+                  <input
+                    type="url"
+                    className="flex-1 w-full p-2 border rounded-md outline-none border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="https://exemple.com/mon-image.jpg"
+                    required
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                  />
                 </div>
               </div>
 
@@ -284,15 +204,10 @@ export const CreateCreatorView: React.FC = () => {
               </div>
 
               <div className="pt-4">
-                <Button variant="primary" className="w-full py-6 text-lg" type="submit" disabled={uploading || isSubmitting}>
-                  {uploading || isSubmitting ? (
+                <Button variant="primary" className="w-full py-6 text-lg" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
                     <span className="flex items-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" />{" "}
-                      {submitStep === "uploading"
-                        ? "Upload de l'image..."
-                        : submitStep === "transaction"
-                        ? "Transaction en cours..."
-                        : "Création en cours..."}
+                      <Loader2 className="w-5 h-5 animate-spin" /> {submitStep === "transaction" ? "Transaction en cours..." : "Création en cours..."}
                     </span>
                   ) : (
                     "Créer mon compte Créateur"

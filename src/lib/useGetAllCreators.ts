@@ -116,7 +116,7 @@ export const useGetAllCreators = () => {
           description: fields.description as string,
           // The Move struct exposes `wallet: address`; we surface it as `owner` in the UI.
           owner: fields.wallet as string,
-          image_url: imageUrl as string,
+          image_url: fields?.image_url || (imageUrl as string),
           price_per_month: String((fields as any).price_per_month ?? "0"),
         } as ContentCreator;
       })
