@@ -55,12 +55,12 @@ export const ContentDetailView: React.FC<ContentDetailViewProps> = ({ content, c
 
       {/* Title */}
       <h1 className="mb-2 text-2xl font-bold text-white">{content.contentName || "Contenu sans titre"}</h1>
-      <p className="mb-6 text-sm text-slate-300">{content.contentDescription}</p>
+      <p className="mb-6 text-sm text-slate-200">{content.contentDescription}</p>
 
       {/* Video area */}
       <div className="mb-6 overflow-hidden bg-black shadow-2xl shadow-indigo-500/10 aspect-video rounded-xl flex items-center justify-center border border-white/10">
         {isDecrypting && !videoUrl && (
-          <div className="flex items-center justify-center text-slate-300">
+          <div className="flex items-center justify-center text-slate-200">
             <Loader2 className="w-6 h-6 mr-2 animate-spin text-indigo-500" />
             <span>Préparation de la vidéo...</span>
           </div>
@@ -80,7 +80,7 @@ export const ContentDetailView: React.FC<ContentDetailViewProps> = ({ content, c
       </div>
 
       {/* Technical info */}
-      <div className="p-4 text-xs glass-panel rounded-xl text-slate-400 border border-white/5">
+      <div className="p-4 text-xs glass-panel rounded-xl text-slate-300 border border-white/5">
         <div className="font-semibold text-slate-200">Informations techniques</div>
         <div className="mt-2 break-all">
           <span className="font-mono text-[11px] text-indigo-300">blobId: {content.blobId}</span>

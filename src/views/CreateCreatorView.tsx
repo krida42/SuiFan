@@ -93,12 +93,12 @@ export const CreateCreatorView: React.FC = () => {
     <div className="max-w-xl mx-auto duration-300 animate-in fade-in">
       <Card className="glass-panel border-white/10 shadow-2xl">
         <CardContent className="p-8">
-          <div className="mb-8 text-center">
+            <div className="mb-8 text-center">
             <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 text-white bg-gradient-to-br from-indigo-500 to-violet-600 rounded-full shadow-lg shadow-indigo-500/30">
               <User className="w-8 h-8" />
             </div>
             <h1 className="text-2xl font-bold text-white">Devenir Créateur</h1>
-            <p className="mt-2 text-slate-300">Configurez votre profil de créateur pour commencer à publier.</p>
+            <p className="mt-2 text-slate-200">Configurez votre profil de créateur pour commencer à publier.</p>
           </div>
 
           {txDigest ? (
@@ -108,7 +108,7 @@ export const CreateCreatorView: React.FC = () => {
               </div>
               <h2 className="text-xl font-semibold text-white">Compte créateur créé avec succès</h2>
               <p className="text-sm text-slate-300">Votre transaction a été confirmée sur la blockchain Sui.</p>
-              <div className="w-full max-w-md p-3 mt-2 font-mono text-xs break-all border rounded-xl bg-white/5 border-white/10 text-slate-300">
+              <div className="w-full max-w-md p-3 mt-2 font-mono text-xs break-all border rounded-xl bg-white/5 border-white/10 text-slate-200">
                 <span className="font-semibold text-white">Digest:</span> {txDigest}
               </div>
               <a
@@ -132,25 +132,25 @@ export const CreateCreatorView: React.FC = () => {
             </div>
           ) : !currentAccount ? (
             <div className="flex flex-col items-center justify-center p-6 space-y-4 text-center border-2 border-dashed rounded-xl bg-white/5 border-white/10">
-              <p className="text-slate-300">Veuillez connecter votre portefeuille pour continuer</p>
+              <p className="text-slate-200">Veuillez connecter votre portefeuille pour continuer</p>
               <ConnectButton />
             </div>
           ) : (
             <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Icon Field */}
               <div>
-                <label className="block mb-2 text-sm font-medium text-slate-300">URL de l'image / Avatar</label>
+                <label className="block mb-2 text-sm font-medium text-slate-200">URL de l'image / Avatar</label>
                 <div className="flex items-center gap-4">
                   <div className="relative flex items-center justify-center w-20 h-20 overflow-hidden border-2 border-dashed rounded-full bg-white/5 border-white/20">
                     {imageUrl ? (
                       <img src={imageUrl} alt="Avatar" className="object-cover w-full h-full" />
                     ) : (
-                      <span className="px-2 text-xs text-center text-slate-500">Aperçu de l'image</span>
+                      <span className="px-2 text-xs text-center text-slate-400">Aperçu de l'image</span>
                     )}
                   </div>
                   <input
                     type="url"
-                    className="flex-1 w-full p-2 border rounded-xl outline-none bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+                    className="flex-1 w-full p-2 border rounded-xl outline-none bg-white/5 border-white/10 text-white placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
                     placeholder="https://exemple.com/mon-image.jpg"
                     required
                     value={imageUrl}
@@ -161,10 +161,10 @@ export const CreateCreatorView: React.FC = () => {
 
               {/* Name Field */}
               <div>
-                <label className="block mb-1 text-sm font-medium text-slate-300">Nom du Créateur</label>
+                <label className="block mb-1 text-sm font-medium text-slate-200">Nom du Créateur</label>
                 <input
                   type="text"
-                  className="w-full p-2 border rounded-xl outline-none bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+                  className="w-full p-2 border rounded-xl outline-none bg-white/5 border-white/10 text-white placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
                   placeholder="Votre nom de scène"
                   required
                   value={name}
@@ -174,9 +174,9 @@ export const CreateCreatorView: React.FC = () => {
 
               {/* Description Field */}
               <div>
-                <label className="block mb-1 text-sm font-medium text-slate-300">Description</label>
+                <label className="block mb-1 text-sm font-medium text-slate-200">Description</label>
                 <textarea
-                  className="w-full h-32 p-2 border rounded-xl outline-none resize-none bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+                  className="w-full h-32 p-2 border rounded-xl outline-none resize-none bg-white/5 border-white/10 text-white placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
                   placeholder="Parlez-nous de votre contenu..."
                   required
                   value={description}
@@ -186,13 +186,13 @@ export const CreateCreatorView: React.FC = () => {
 
               {/* Subscription Price Field */}
               <div>
-                <label className="block mb-1 text-sm font-medium text-slate-300">Prix de l'abonnement (€/mois)</label>
+                <label className="block mb-1 text-sm font-medium text-slate-200">Prix de l'abonnement (€/mois)</label>
                 <div className="relative">
                   <input
                     type="number"
                     step="0.01"
                     min="0"
-                    className="w-full p-2 pl-8 border rounded-xl outline-none bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+                    className="w-full p-2 pl-8 border rounded-xl outline-none bg-white/5 border-white/10 text-white placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
                     placeholder="9.99"
                     required
                     value={subscribePrice}
@@ -200,7 +200,7 @@ export const CreateCreatorView: React.FC = () => {
                   />
                   <span className="absolute left-3 top-2 text-slate-400">€</span>
                 </div>
-                <p className="mt-1 text-xs text-slate-400">Vous recevrez 99% des revenus générés.</p>
+                <p className="mt-1 text-xs text-slate-300">Vous recevrez 99% des revenus générés.</p>
               </div>
 
               <div className="pt-4">

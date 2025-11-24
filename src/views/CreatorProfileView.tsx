@@ -64,15 +64,15 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({
     <div className="duration-500 animate-in slide-in-from-bottom-4">
       {/* Cover Image */}
       <div className="relative w-full h-48 overflow-hidden bg-indigo-900 md:h-64 rounded-t-2xl">
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent z-10"></div>
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
         <img className="object-cover w-full h-full opacity-80" />
       </div>
 
       {/* Profile Header */}
-      <div className="relative px-6 pb-6 mb-8 glass-panel border-t-0 shadow-xl md:px-10 rounded-b-2xl">
+      <div className="relative z-50 px-6 pb-6 mb-8 border-t-0 shadow-xl glass-panel md:px-10 rounded-b-2xl">
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
-          <div className="flex items-end gap-6 -mt-12 z-20">
-            <div className="relative z-10 w-32 h-32 overflow-hidden bg-slate-800 border-4 border-slate-900 rounded-full shadow-2xl">
+          <div className="z-20 flex items-end gap-6 -mt-12">
+            <div className="relative w-32 h-32 overflow-hidden border-4 rounded-full shadow-2xl bg-slate-800 border-slate-900">
               <img
                 src={activeCreator.avatarUrl || "https://avatar.iran.liara.run/public"}
                 alt="Close up portrait of the creator"
@@ -107,8 +107,10 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({
       {/* Content Tabs */}
       <div className="flex items-center gap-8 px-2 mb-6 border-b border-white/10">
         <button className="pb-3 text-sm font-medium text-indigo-400 border-b-2 border-indigo-400">Vidéos</button>
-        <button className="pb-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-white transition-colors">Communauté</button>
-        <button className="pb-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-white transition-colors">À propos</button>
+        <button className="pb-3 text-sm font-medium transition-colors border-b-2 border-transparent text-slate-400 hover:text-white">
+          Communauté
+        </button>
+        <button className="pb-3 text-sm font-medium transition-colors border-b-2 border-transparent text-slate-400 hover:text-white">À propos</button>
       </div>
 
       {/* Creator Video Grid */}
@@ -126,20 +128,20 @@ export const CreatorProfileView: React.FC<CreatorProfileViewProps> = ({
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {contents.map((content) => (
               <div key={content.id} className="cursor-pointer group" onClick={() => goToContent(content)}>
-                <div className="relative mb-3 overflow-hidden rounded-xl aspect-video bg-slate-800 border border-white/5 group-hover:border-indigo-500/30 transition-all shadow-lg group-hover:shadow-indigo-500/20">
+                <div className="relative mb-3 overflow-hidden transition-all border shadow-lg rounded-xl aspect-video bg-slate-800 border-white/5 group-hover:border-indigo-500/30 group-hover:shadow-indigo-500/20">
                   <div className="flex items-center justify-center w-full h-full text-xs font-medium text-slate-400 bg-white/5 backdrop-blur-sm">
                     Contenu chiffré
                   </div>
                   <div className="absolute top-2 right-2">
                     <Badge variant="free">On-chain</Badge>
                   </div>
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                  <div className="absolute inset-0 transition-colors bg-black/20 group-hover:bg-transparent"></div>
                 </div>
-                <h4 className="font-bold text-white group-hover:text-indigo-400 transition-colors line-clamp-2">{content.contentName || "Contenu sans titre"}</h4>
+                <h4 className="font-bold text-white transition-colors group-hover:text-indigo-400 line-clamp-2">
+                  {content.contentName || "Contenu sans titre"}
+                </h4>
                 <p className="mt-1 text-xs text-slate-400 line-clamp-3">{content.contentDescription}</p>
-                <p className="mt-1 text-[10px] text-slate-500 break-all font-mono">
-                  blobId: {content.blobId.slice(0, 10)}...
-                </p>
+                <p className="mt-1 text-[10px] text-slate-500 break-all font-mono">blobId: {content.blobId.slice(0, 10)}...</p>
               </div>
             ))}
           </div>

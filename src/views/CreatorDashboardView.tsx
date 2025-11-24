@@ -150,7 +150,7 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
           Uploader du contenu
         </h1>
         <div className="w-full md:w-72">
-          <label className="block mb-1 text-sm font-medium text-slate-300">Sélectionnez un créateur</label>
+          <label className="block mb-1 text-sm font-medium text-slate-200">Sélectionnez un créateur</label>
           <select
             className="w-full p-2 text-sm border rounded-xl outline-none border-white/10 bg-white/5 text-slate-200 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/30 disabled:text-slate-500"
             value={selectedCreatorId}
@@ -174,10 +174,10 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
         <Card className="w-full max-w-2xl pt-6 border-white/10 shadow-xl glass-panel">
           <CardContent className="p-6 space-y-5">
             <div>
-              <label className="block mb-1 text-sm font-medium text-slate-300">Titre de la vidéo</label>
+              <label className="block mb-1 text-sm font-medium text-slate-200">Titre de la vidéo</label>
               <input
                 type="text"
-                className={`w-full p-2 border rounded-xl outline-none bg-white/5 text-white placeholder:text-slate-500 focus:ring-2 focus:border-transparent transition-all ${
+                className={`w-full p-2 border rounded-xl outline-none bg-white/5 text-white placeholder:text-slate-300 focus:ring-2 focus:border-transparent transition-all ${
                   hasTriedSubmit && !title.trim() ? "border-red-500/50 focus:ring-red-500/50" : "border-white/10 focus:ring-indigo-500/50"
                 }`}
                 placeholder="Ex: Tutoriel Exclusif..."
@@ -187,9 +187,9 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
               {hasTriedSubmit && !title.trim() && <p className="mt-1 text-xs text-red-400">Le titre est requis.</p>}
             </div>
             <div>
-              <label className="block mb-1 text-sm font-medium text-slate-300">Description</label>
+              <label className="block mb-1 text-sm font-medium text-slate-200">Description</label>
               <textarea
-                className={`w-full h-24 p-2 border rounded-xl outline-none resize-none bg-white/5 text-white placeholder:text-slate-500 focus:ring-2 focus:border-transparent transition-all ${
+                className={`w-full h-24 p-2 border rounded-xl outline-none resize-none bg-white/5 text-white placeholder:text-slate-300 focus:ring-2 focus:border-transparent transition-all ${
                   hasTriedSubmit && !description.trim() ? "border-red-500/50 focus:ring-red-500/50" : "border-white/10 focus:ring-indigo-500/50"
                 }`}
                 placeholder="De quoi parle votre vidéo ?"
@@ -209,12 +209,14 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
               />
               <div className="text-center">
                 <div className="p-3 mb-2 rounded-full bg-white/5 group-hover:bg-indigo-500/20 transition-colors inline-block">
-                  <Upload className="w-8 h-8 text-slate-400 group-hover:text-indigo-400 transition-colors" />
+                  <Upload className="w-8 h-8 text-slate-300 group-hover:text-indigo-400 transition-colors" />
                 </div>
-                <p className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">{isUploading ? "Chiffrement en cours..." : "Glisser le fichier vidéo ici"}</p>
-                <p className="text-xs text-slate-500">MP4, MOV jusqu'à 2Go</p>
+                <p className="text-sm font-medium text-slate-200 group-hover:text-white transition-colors">
+                  {isUploading ? "Chiffrement en cours..." : "Glisser le fichier vidéo ici"}
+                </p>
+                <p className="text-xs text-slate-400">MP4, MOV jusqu'à 2Go</p>
                 {selectedFileName && (
-                  <p className="mt-3 text-xs text-slate-400">
+                  <p className="mt-3 text-xs text-slate-300">
                     Fichier sélectionné: <span className="font-semibold text-indigo-300">{selectedFileName}</span>
                   </p>
                 )}
@@ -231,11 +233,11 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
               </Button>
               {formError && <p className="mt-2 text-xs text-red-400">{formError}</p>}
               {(suiDigest || blobId) && (
-                <div className="mt-4 space-y-2 text-xs text-slate-400">
+                <div className="mt-4 space-y-2 text-xs text-slate-300">
                   {suiDigest && (
                     <>
                       <div className="font-mono break-all">
-                        <span className="font-semibold text-slate-300">Sui digest:</span> {suiDigest}
+                        <span className="font-semibold text-slate-200">Sui digest:</span> {suiDigest}
                       </div>
                       <a
                         href={`https://testnet.suivision.xyz/txblock/${suiDigest}`}
@@ -250,7 +252,7 @@ export const CreatorDashboardView: React.FC<CreatorDashboardViewProps> = ({ dash
                   {blobId && (
                     <>
                       <div className="font-mono break-all">
-                        <span className="font-semibold text-slate-300">Walrus blobId:</span> {blobId}
+                        <span className="font-semibold text-slate-200">Walrus blobId:</span> {blobId}
                       </div>
                       <a
                         href={`https://walruscan.com/testnet/blob/${blobId}`}
